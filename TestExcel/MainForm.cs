@@ -6,7 +6,8 @@ namespace TestExcel
 {
     public partial class MainForm : Form
     {
-        private string path = @"c:\\Users\\Destiny\\Desktop\\a.xls";
+        //private string path = @"c:\\Users\\Destiny\\Desktop\\a.xls";
+        private string path = @"C:\Users\Destiny\Desktop\тесты готово\7064\1_1.xlsx";
         public MainForm()
         {
             InitializeComponent();
@@ -16,13 +17,13 @@ namespace TestExcel
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var data = Excel.Parse(openFileDialog.FileName);
+                var data = Excel.ParseEx1And2(openFileDialog.FileName);
             }
         }
 
         private void btnAutoClick_Click(object sender, EventArgs e)
         {
-            var data = Excel.Parse(path);
+            var data = Excel.ParseEx1And2(path);
         }
     }
 }

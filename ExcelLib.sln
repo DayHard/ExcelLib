@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelLib", "ExcelLib\ExcelLib.csproj", "{0C6EA244-C2D6-4C01-A414-35C6A42E4660}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EF97A483-FDD3-479B-84BF-6D6BD131769F} = {EF97A483-FDD3-479B-84BF-6D6BD131769F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestExcel", "TestExcel\TestExcel.csproj", "{EF97A483-FDD3-479B-84BF-6D6BD131769F}"
 EndProject

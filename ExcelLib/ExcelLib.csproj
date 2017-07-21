@@ -44,8 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EData1and2.cs" />
+    <Compile Include="EData3.cs" />
+    <Compile Include="EData4.cs" />
     <Compile Include="Excel.cs" />
-    <Compile Include="ExcelData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

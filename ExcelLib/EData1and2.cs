@@ -2,14 +2,14 @@
 
 namespace ExcelLib
 {
-    public class ExcelData
+    public class EData1And2
     {
         private int _index;
         private string _comment;
         public In Input;
         public Out Output;
 
-        public ExcelData()
+        public EData1And2()
         {
             _index = 0;
             _comment = String.Empty;
@@ -32,15 +32,15 @@ namespace ExcelLib
 
     public class In
     {
-        private string _channel;
+        private int _channel;
         private string _device;
 
         public In()
         {
-            _channel = String.Empty;
+            _channel = 0;
             _device = String.Empty;
         }
-        public string Channel
+        public int Channel
         {
             get { return _channel; }
             set { _channel = value; }
@@ -55,16 +55,16 @@ namespace ExcelLib
 
     public class Out
     {
-        private string _channel;
+        private int _channel;
         private string _device;
 
         public Out()
         {
-            Channel = String.Empty;
+            Channel = 0;
             Device = String.Empty;
         }
 
-        public string Channel
+        public int Channel
         {
             get { return _channel; }
             set { _channel = value; }
