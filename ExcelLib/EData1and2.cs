@@ -13,10 +13,8 @@ namespace ExcelLib
         {
             _index = 0;
             _comment = String.Empty;
-            In input = new In();
-            Out output = new Out();
-            Input = input;
-            Output = output;
+            Input = new In();
+            Output = new Out();
         }
         public int Index
         {
