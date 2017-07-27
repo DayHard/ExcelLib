@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ExcelLib
 {
-    public enum control
+    public enum Control
     {
         Напряжение,
         Сопротивление,
@@ -14,7 +14,7 @@ namespace ExcelLib
         ПадениеНапряженияЭб,
         ПадениеНапряженияЭк,
     }
-    public enum multMode
+    public enum MultMode
     {
         DiodeTest,
         Resistance,
@@ -23,52 +23,53 @@ namespace ExcelLib
     }
     public class EData3
     {
-        public multMode MultMode;
-        public control Control;
-        public VoltSource VoltSource;
         public EData3()
         {
             _index = 0;
-            _currSource = 0;
             _comment = String.Empty;
             _valMin = 0;
             _valMax = 0;
             _valUnit = String.Empty;
             Input = new In[7];
-            VoltSource = new VoltSource();
+            VoltSupply = new VoltSupply();
         }
-        public EData3(int inputCount)
+        public EData3(int inputCount, int inputCount2)
         {
             _index = 0;
-            _currSource = 0;
             _comment = String.Empty;
             _valMin = 0;
             _valMax = 0;
             _valUnit = String.Empty;
+            VoltSupply = new VoltSupply();
             Input = new In[inputCount];
-            VoltSource = new VoltSource();
+            for (int i = 0; i < Input.Length; i++)
+            {
+                Input[i] = new In();
+            }
+            currSource = new currSource[inputCount2];
+            for (int i = 0; i < currSource.Length; i++)
+            {
+                currSource[i] = new currSource();
+            }
         }
 
         private int _index;
-        public string gsdfgsdfsdfsdfsdfsdf;
-        private short _currSource;
-        //private short _voltSource;
         private string _comment;
-        private int _valMin;
-        private int _valMax;
+        private double _valMin;
+        private double _valMax;
         private string _valUnit;
         public In[] Input;
+        public MultMode MultMode;
+        public Control Control;
+        public VoltSupply VoltSupply;
+        public currSource[] currSource;
+
         public int Index
         {
             get { return _index; }
             set { _index = value; }
         }
 
-        public short CurrSource
-        {
-            get { return _currSource; }
-            set { _currSource = value; }
-        }
 
         public string Comment
         {
@@ -76,13 +77,13 @@ namespace ExcelLib
             set { _comment = value; }
         }
 
-        public int ValMin
+        public double ValMin
         {
             get { return _valMin; }
             set { _valMin = value; }
         }
 
-        public int ValMax
+        public double ValMax
         {
             get { return _valMax; }
             set { _valMax = value; }
@@ -95,25 +96,41 @@ namespace ExcelLib
         }
     }
 
-    public class VoltSource
+    public class VoltSupply
     {
-        private int _power1;
-        private int _power2;
+        private int _v1;
+        private int _v2;
 
-        public VoltSource()
+        public VoltSupply()
         {
-            _power1 = 0;
-            _power2 = 0;
+            _v1 = 0;
+            _v2 = 0;
         }
-        public int Power1
+        public int V1
         {
-            get { return _power1; }
-            set { _power1 = value; }
+            get { return _v1; }
+            set { _v1 = value; }
         }
-        public int Power2
+        public int V2
         {
-            get { return _power2; }
-            set { _power2 = value; }
+            get { return _v2; }
+            set { _v2 = value; }
+        }
+    }
+
+    public class currSource
+    {
+        private int _currSource;
+
+        public currSource()
+        {
+            _currSource = 0;
+        }
+
+        public int CurrSource
+        {
+            get { return _currSource; }
+            set { _currSource = value; }
         }
     }
 }

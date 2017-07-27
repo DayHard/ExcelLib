@@ -4,6 +4,7 @@ using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -15,7 +16,9 @@ namespace ExcelLib
     {
         public static EData1And2[] EData1 { get; set; }
         public static EData3[] EData3 { get; set; }
+
         public static EData4[] EData4 { get; set; }
+
         //Преобразование из XLS к DataTable
         private static DataTable ParseTable(string path)
         {
@@ -25,15 +28,15 @@ namespace ExcelLib
                 if (System.IO.File.Exists(path))
                 {
 
-                    IWorkbook workbook = null;  //IWorkbook determina si es xls o xlsx              
+                    IWorkbook workbook = null; //IWorkbook determina si es xls o xlsx              
                     ISheet worksheet = null;
                     string first_sheet_name = "";
 
                     using (FileStream FS = new FileStream(path, FileMode.Open, FileAccess.Read))
                     {
-                        workbook = WorkbookFactory.Create(FS);          //Abre tanto XLS como XLSX
-                        worksheet = workbook.GetSheetAt(0);    //Obtener Hoja por indice
-                        first_sheet_name = worksheet.SheetName;         //Obtener el nombre de la Hoja
+                        workbook = WorkbookFactory.Create(FS); //Abre tanto XLS como XLSX
+                        worksheet = workbook.GetSheetAt(0); //Obtener Hoja por indice
+                        first_sheet_name = worksheet.SheetName; //Obtener el nombre de la Hoja
 
                         Tabla = new DataTable(first_sheet_name);
                         Tabla.Rows.Clear();
@@ -49,7 +52,10 @@ namespace ExcelLib
 
                             if (rowIndex == 0)
                             {
-                                row2 = worksheet.GetRow(rowIndex + 1); //Si es la Primera fila, obtengo tambien la segunda para saber el tipo de datos
+                                row2 =
+                                    worksheet.GetRow(
+                                        rowIndex +
+                                        1); //Si es la Primera fila, obtengo tambien la segunda para saber el tipo de datos
                                 row3 = worksheet.GetRow(rowIndex + 2); //Y la tercera tambien por las dudas
                             }
 
@@ -70,21 +76,35 @@ namespace ExcelLib
                                         for (int i = 0; i < 2; i++)
                                         {
                                             ICell cell2 = null;
-                                            if (i == 0) { cell2 = row2.GetCell(cell.ColumnIndex); }
-                                            else { cell2 = row3.GetCell(cell.ColumnIndex); }
+                                            if (i == 0)
+                                            {
+                                                cell2 = row2.GetCell(cell.ColumnIndex);
+                                            }
+                                            else
+                                            {
+                                                cell2 = row3.GetCell(cell.ColumnIndex);
+                                            }
 
                                             if (cell2 != null)
                                             {
                                                 switch (cell2.CellType)
                                                 {
                                                     case CellType.Blank: break;
-                                                    case CellType.Boolean: cellType2[i] = "System.Boolean"; break;
-                                                    case CellType.String: cellType2[i] = "System.String"; break;
+                                                    case CellType.Boolean:
+                                                        cellType2[i] = "System.Boolean";
+                                                        break;
+                                                    case CellType.String:
+                                                        cellType2[i] = "System.String";
+                                                        break;
                                                     case CellType.Numeric:
-                                                        if (HSSFDateUtil.IsCellDateFormatted(cell2)) { cellType2[i] = "System.DateTime"; }
+                                                        if (HSSFDateUtil.IsCellDateFormatted(cell2))
+                                                        {
+                                                            cellType2[i] = "System.DateTime";
+                                                        }
                                                         else
                                                         {
-                                                            cellType2[i] = "System.Double";  //valorCell = cell2.NumericCellValue;
+                                                            cellType2[i] =
+                                                                "System.Double"; //valorCell = cell2.NumericCellValue;
                                                         }
                                                         break;
 
@@ -92,32 +112,57 @@ namespace ExcelLib
                                                         bool continuar = true;
                                                         switch (cell2.CachedFormulaResultType)
                                                         {
-                                                            case CellType.Boolean: cellType2[i] = "System.Boolean"; break;
-                                                            case CellType.String: cellType2[i] = "System.String"; break;
+                                                            case CellType.Boolean:
+                                                                cellType2[i] = "System.Boolean";
+                                                                break;
+                                                            case CellType.String:
+                                                                cellType2[i] = "System.String";
+                                                                break;
                                                             case CellType.Numeric:
-                                                                if (HSSFDateUtil.IsCellDateFormatted(cell2)) { cellType2[i] = "System.DateTime"; }
+                                                                if (HSSFDateUtil.IsCellDateFormatted(cell2))
+                                                                {
+                                                                    cellType2[i] = "System.DateTime";
+                                                                }
                                                                 else
                                                                 {
                                                                     try
                                                                     {
                                                                         //DETERMINAR SI ES BOOLEANO
-                                                                        if (cell2.CellFormula == "TRUE()") { cellType2[i] = "System.Boolean"; continuar = false; }
-                                                                        if (continuar && cell2.CellFormula == "FALSE()") { cellType2[i] = "System.Boolean"; continuar = false; }
-                                                                        if (continuar) { cellType2[i] = "System.Double"; continuar = false; }
+                                                                        if (cell2.CellFormula == "TRUE()")
+                                                                        {
+                                                                            cellType2[i] = "System.Boolean";
+                                                                            continuar = false;
+                                                                        }
+                                                                        if (continuar && cell2.CellFormula == "FALSE()")
+                                                                        {
+                                                                            cellType2[i] = "System.Boolean";
+                                                                            continuar = false;
+                                                                        }
+                                                                        if (continuar)
+                                                                        {
+                                                                            cellType2[i] = "System.Double";
+                                                                            continuar = false;
+                                                                        }
                                                                     }
-                                                                    catch { }
+                                                                    catch
+                                                                    {
+                                                                    }
                                                                 }
                                                                 break;
                                                         }
                                                         break;
                                                     default:
-                                                        cellType2[i] = "System.String"; break;
+                                                        cellType2[i] = "System.String";
+                                                        break;
                                                 }
                                             }
                                         }
 
                                         //Resolver las diferencias de Tipos
-                                        if (cellType2[0] == cellType2[1]) { cellType = cellType2[0]; }
+                                        if (cellType2[0] == cellType2[1])
+                                        {
+                                            cellType = cellType2[0];
+                                        }
                                         else
                                         {
                                             if (cellType2[0] == null) cellType = cellType2[1];
@@ -127,47 +172,82 @@ namespace ExcelLib
 
                                         //Obtener el nombre de la Columna
                                         string colName = "Column_{0}";
-                                        try { colName = cell.StringCellValue; }
-                                        catch { colName = string.Format(colName, colIndex); }
+                                        try
+                                        {
+                                            colName = cell.StringCellValue;
+                                        }
+                                        catch
+                                        {
+                                            colName = string.Format(colName, colIndex);
+                                        }
 
                                         //Verificar que NO se repita el Nombre de la Columna
                                         foreach (DataColumn col in Tabla.Columns)
                                         {
-                                            if (col.ColumnName == colName) colName = string.Format("{0}_{1}", colName, colIndex);
+                                            if (col.ColumnName == colName)
+                                                colName = string.Format("{0}_{1}", colName, colIndex);
                                         }
 
                                         //Agregar el campos de la tabla:
-                                        DataColumn codigo = new DataColumn();//colName, System.Type.GetType(cellType));
-                                        Tabla.Columns.Add(codigo); colIndex++;
+                                        DataColumn codigo = new DataColumn(); //colName, System.Type.GetType(cellType));
+                                        Tabla.Columns.Add(codigo);
+                                        colIndex++;
                                     }
                                     else
                                     {
                                         //Las demas filas son registros:
                                         switch (cell.CellType)
                                         {
-                                            case CellType.Blank: valorCell = DBNull.Value; break;
-                                            case CellType.Boolean: valorCell = cell.BooleanCellValue; break;
-                                            case CellType.String: valorCell = cell.StringCellValue; break;
+                                            case CellType.Blank:
+                                                valorCell = DBNull.Value;
+                                                break;
+                                            case CellType.Boolean:
+                                                valorCell = cell.BooleanCellValue;
+                                                break;
+                                            case CellType.String:
+                                                valorCell = cell.StringCellValue;
+                                                break;
                                             case CellType.Numeric:
-                                                if (HSSFDateUtil.IsCellDateFormatted(cell)) { valorCell = cell.DateCellValue; }
-                                                else { valorCell = cell.NumericCellValue; }
+                                                if (HSSFDateUtil.IsCellDateFormatted(cell))
+                                                {
+                                                    valorCell = cell.DateCellValue;
+                                                }
+                                                else
+                                                {
+                                                    valorCell = cell.NumericCellValue;
+                                                }
                                                 break;
                                             case CellType.Formula:
                                                 switch (cell.CachedFormulaResultType)
                                                 {
-                                                    case CellType.Blank: valorCell = DBNull.Value; break;
-                                                    case CellType.String: valorCell = cell.StringCellValue; break;
-                                                    case CellType.Boolean: valorCell = cell.BooleanCellValue; break;
+                                                    case CellType.Blank:
+                                                        valorCell = DBNull.Value;
+                                                        break;
+                                                    case CellType.String:
+                                                        valorCell = cell.StringCellValue;
+                                                        break;
+                                                    case CellType.Boolean:
+                                                        valorCell = cell.BooleanCellValue;
+                                                        break;
                                                     case CellType.Numeric:
-                                                        if (HSSFDateUtil.IsCellDateFormatted(cell)) { valorCell = cell.DateCellValue; }
-                                                        else { valorCell = cell.NumericCellValue; }
+                                                        if (HSSFDateUtil.IsCellDateFormatted(cell))
+                                                        {
+                                                            valorCell = cell.DateCellValue;
+                                                        }
+                                                        else
+                                                        {
+                                                            valorCell = cell.NumericCellValue;
+                                                        }
                                                         break;
                                                 }
                                                 break;
-                                            default: valorCell = cell.StringCellValue; break;
+                                            default:
+                                                valorCell = cell.StringCellValue;
+                                                break;
                                         }
                                         //Agregar el nuevo Registro
-                                        if (cell.ColumnIndex <= Tabla.Columns.Count - 1) NewReg[cell.ColumnIndex] = valorCell;
+                                        if (cell.ColumnIndex <= Tabla.Columns.Count - 1)
+                                            NewReg[cell.ColumnIndex] = valorCell;
                                     }
                                 }
                             }
@@ -187,6 +267,7 @@ namespace ExcelLib
             }
             return Tabla;
         }
+
         //Парсит Excel1 и Excel2
         public static EData1And2[] ParseEx(string path)
         {
@@ -274,6 +355,7 @@ namespace ExcelLib
             }
             return EData1;
         }
+
         //Парсим Excel3
         public static EData3[] ParseEx3(string path)
         {
@@ -310,43 +392,173 @@ namespace ExcelLib
                 }
                 size = 0;
             }
+            int counter2 = 0;
+            int[] intSize2 = new int[lenght];
+            for (int i = 0; i < intSize2.Length; i++)
+            {
+                while (true)
+                {
+                    if (list[2,counter2] != String.Empty && list[2,counter2] != "источник питания,I mA")
+                    {
+                        intSize2[i] = list[2, counter2].ToCharArray().Where(x => x == '/').Count();
+                        counter2++;
+                        break;
+                    }
+                    counter2++;
+                }
+
+            }
 
             EData3 = new EData3[lenght];
             for (int i = 0; i < EData3.Length; i++)
             {
-                EData3[i] = new EData3(intSize[i] + 1);
+                EData3[i] = new EData3(intSize[i] + 1, intSize2[i] + 1);
             }
             int k = 0;
             for (int i = 0; i < table.Rows.Count; i++)
             {
-                if (list[0,i] != String.Empty && char.IsDigit(Convert.ToChar(list[0, i])))
+                int Num;
+                bool isNum = int.TryParse(list[0,i], out Num);
+                if (list[0, i] != String.Empty && isNum)
                 {
                     EData3[k].Index = Convert.ToInt32(list[0, i]);
-                    switch (list[1,i])
+                    switch (list[1, i])
                     {
                         case "3":
-                            EData3[k].MultMode = multMode.DCVoltage;
+                            EData3[k].MultMode = MultMode.DCVoltage;
                             break;
                         case "2":
-                            EData3[k].MultMode = multMode.Resistance;
+                            EData3[k].MultMode = MultMode.Resistance;
                             break;
                         case "1":
-                            EData3[k].MultMode = multMode.DiodeTest;
+                            EData3[k].MultMode = MultMode.DiodeTest;
                             break;
                         case "0":
                             EData3[k].MultMode = 0;
                             break;
                     }
-                    EData3[k].CurrSource= Convert.ToInt16(list[2, i]);
+                    if (EData3[k].currSource.Length != 1)
+                    {
+                        string[] curr = list[2, i].Split('/');
+                        EData3[k].currSource[0].CurrSource = Convert.ToInt32(curr[0]);
+                        EData3[k].currSource[1].CurrSource = Convert.ToInt32(curr[1]);
+                    }
+                    else
+                    {
+                        EData3[k].currSource[0].CurrSource = Convert.ToInt32(list[2, i]);
+                    }
 
-                    var power = list[3, i].Split('/');
-                    EData3[k].VoltSource.Power1 = Convert.ToInt32(power[0]);   
-                    //EData3[k].VoltSource.Power2 = Convert.ToInt32(power[1]);
- 
-                    ////////////////
-                    /// Parse K5R1
-                    ///////////////
-                    
+
+                    var voltage = list[3, i].Split('/');
+
+                    if (voltage[0] == "-")
+                    {
+                        EData3[k].VoltSupply.V1 = 0;
+                    }
+                    else
+                    {
+                        EData3[k].VoltSupply.V1 = Convert.ToInt32(voltage[0]);
+                    }
+
+                    if (voltage[1] == "-")
+                    {
+                        EData3[k].VoltSupply.V2 = 0;
+                    }
+                    else
+                    {
+                        EData3[k].VoltSupply.V2 = Convert.ToInt32(voltage[1]);
+                    }
+
+                    var device = list[4, i].Split('/');
+                    for (int j = 0; j < EData3[k].Input.Length; j++)
+                    {
+                        var device2 = device[j].Split('R');
+                        var device3 = device2[0].Split('K');
+                        EData3[k].Input[j].Device = @"R" + device2[1];
+                        if (device3[0] != String.Empty)
+                        {
+                            EData3[k].Input[j].Channel = Convert.ToInt32(device3[0]);
+                        }
+                        else
+                        {
+                            EData3[k].Input[j].Channel = Convert.ToInt32(device3[1]);
+                        }
+                    }
+                    //Комментарий
+                    EData3[k].Comment = list[5, i];
+
+                    //Контроль
+                    switch (list[6,i])
+                    {
+                        case "напряжение":
+                            EData3[k].Control = Control.Напряжение;
+                            break;
+                        case "сопротивление":
+                            EData3[k].Control = Control.Сопротивление;
+                            break;
+                        case "индикация":
+                            EData3[k].Control = Control.Индикация;
+                            break;
+                        case "падение напряжение БК":
+                            EData3[k].Control = Control.ПадениеНапряженияБк;
+                            break;
+                        case "падение напряжение БЭ":
+                            EData3[k].Control = Control.ПадениеНапряженияБэ;
+                            break;
+                        case "падение напряжение КБ":
+                            EData3[k].Control = Control.ПадениеНапряженияКб;
+                            break;
+                        case "падение напряжение ЭБ":
+                            EData3[k].Control = Control.ПадениеНапряженияЭб;
+                            break;
+                        case "падение напряжение ЭК":
+                            EData3[k].Control = Control.ПадениеНапряженияЭк;
+                            break;
+                    }
+
+                    if (list[7, i] != String.Empty)
+                    {
+                        double data = 0;
+                        if (!Double.TryParse(list[7,i], out data))
+                        {
+                            var min = list[7, i].Split(' ');
+                            EData3[k].ValMin = Convert.ToDouble(min[0]);
+                            EData3[k].ValUnit = min[1];
+                        }
+                        else
+                        {
+                            EData3[k].ValMin = data;
+                        }
+                    }
+                    else
+                    {
+                        EData3[k].ValMin = 0;
+                    }
+
+                    if (list[8,i] !=  String.Empty)
+                    {
+                        if (list[8,i] != "∞")
+                        {
+                            double data2 = 0;
+                            if (!Double.TryParse(list[8,i],out data2) && list[8,i] != String.Empty)
+                            {
+                                var max = list[8, i].Split(' ');
+                                EData3[k].ValMax = Convert.ToDouble(max[0]);
+                            }
+                            else
+                            {
+                                EData3[k].ValMax = data2;
+                            }
+                        }
+                        else
+                        {
+                            EData3[k].ValMax = Double.MaxValue;
+                        } 
+                    }
+                    else
+                    {
+                        EData3[k].ValMax = 0;
+                    }
                     k++;
                 }
             }
@@ -354,3 +566,4 @@ namespace ExcelLib
         }
     }
 }
+
