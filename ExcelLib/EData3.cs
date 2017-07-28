@@ -46,10 +46,10 @@ namespace ExcelLib
             {
                 Input[i] = new In();
             }
-            currSource = new currSource[inputCount2];
-            for (int i = 0; i < currSource.Length; i++)
+            CurrSource = new currSource[inputCount2];
+            for (int i = 0; i < CurrSource.Length; i++)
             {
-                currSource[i] = new currSource();
+                CurrSource[i] = new currSource();
             }
         }
 
@@ -62,7 +62,7 @@ namespace ExcelLib
         public MultMode MultMode;
         public Control Control;
         public VoltSupply VoltSupply;
-        public currSource[] currSource;
+        public currSource[] CurrSource;
 
         public int Index
         {
