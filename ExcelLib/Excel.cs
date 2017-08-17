@@ -11,6 +11,7 @@ namespace ExcelLib
         public static EData1And2[] EData { get; set; }
         public static EData3[] EData3 { get; set; }
         public static EData4[] EData4 { get; set; }
+        public static EData5[] EData5 { get; set; }
 
         //Преобразование из XLS к DataTable
         private static DataTable ParseTable(string path)
@@ -348,7 +349,7 @@ namespace ExcelLib
                 }
                 return EData;
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }
@@ -570,7 +571,7 @@ namespace ExcelLib
                 }
                 return EData3;
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }
@@ -635,6 +636,76 @@ namespace ExcelLib
                     }
                 }
                 return EData4;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        //Парсим Excel5
+        public static EData5[] ParseEx5(string path)
+        {
+            try
+            {
+                var table = ParseTable(path);
+
+                string[,] list = new string[table.Columns.Count, table.Rows.Count];
+
+                if (table.Columns.Count == 0 && table.Rows.Count == 0)
+                {
+                    return null;
+                }
+
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    for (int j = 0; j < table.Rows.Count; j++)
+                    {
+                        list[i, j] = table.Rows[j][i].ToString();
+                    }
+                }
+
+                int lenght = 0;
+                for (int j = 0; j < table.Rows.Count; j++)
+                {
+                    int parsedValue;
+                    if (list[0, j] != String.Empty && int.TryParse(list[0, j], out parsedValue) && parsedValue > lenght)
+                    {
+                        lenght = parsedValue;
+                    }
+                }
+
+
+                EData5 = new EData5[lenght];
+                for (int i = 0; i < EData5.Length; i++)
+                {
+                    EData5[i] = new EData5();
+                }
+                int k = 0;
+                for (int i = 0; i < table.Rows.Count; i++)
+                {
+                    int value;
+                    if (list[0, i] != String.Empty && int.TryParse(list[0, i], out value))
+                    {
+                        EData5[k].Index = value;
+                        EData5[k].Max = Double.NegativeInfinity; //list[3, i]
+                        EData5[k].Min = Double.NegativeInfinity; //list[4, i]
+                        EData5[k].Value = Double.NegativeInfinity; //list[5, i]
+                        EData5[k].Comment = list[6, i] +" "+ list[7, i];
+
+                        var indata = list[1, i].Split('r');
+                        var indata2 = indata[0].Split('k');
+                        EData5[k].Input.Device = "R" + indata[1];
+                        EData5[k].Input.Channel = Convert.ToInt32(indata2[1]);
+
+                        var outdata = list[2, i].Split('r');
+                        var outdata2 = outdata[0].Split('k');
+                        EData5[k].Output.Device = "R" + outdata[1];
+                        EData5[k].Output.Channel = Convert.ToInt32(outdata2[1]);
+                        k++;
+                    }
+                }
+                return EData5;
             }
             catch
             {
