@@ -11,7 +11,7 @@ namespace ExcelLib
         public static EData1And2[] EData { get; set; }
         public static EData3[] EData3 { get; set; }
         public static EData4[] EData4 { get; set; }
-        public static EData5[] EData5 { get; set; }
+        public static BPPPTest[] BPPPTest { get; set; }
 
         //Преобразование из XLS к DataTable
         private static DataTable ParseTable(string path)
@@ -257,6 +257,11 @@ namespace ExcelLib
         }
 
         //Парсит Excel1 и Excel2
+        /// <summary>
+        /// Парсит таблицу типа 1, возвращает список тестов в указанном формате
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static EData1And2[] ParseEx(string path)
         {
             try
@@ -356,6 +361,11 @@ namespace ExcelLib
         }
 
         //Парсим Excel3
+        /// <summary>
+        /// Парсит таблицу типа 3, возвращает список тестов в указанном формате
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static EData3[] ParseEx3(string path)
         {
             try
@@ -578,6 +588,11 @@ namespace ExcelLib
         }
 
         //Парсим Excel4
+        /// <summary>
+        /// Парсит таблицу типа 4, возвращает список тестов в указанном формате
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static EData4[] ParseEx4(string path)
         {
             try
@@ -644,7 +659,12 @@ namespace ExcelLib
         }
 
         //Парсим Excel5
-        public static EData5[] ParseEx5(string path)
+        /// <summary>
+        /// Используется для блока проверки печатных плат, возвращает тесты ввиде массива (BPPP)
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static BPPPTest[] ParseBPPP(string path)
         {
             try
             {
@@ -676,10 +696,10 @@ namespace ExcelLib
                 }
 
 
-                EData5 = new EData5[lenght];
+                EData5 = new BPPPTest[lenght];
                 for (int i = 0; i < EData5.Length; i++)
                 {
-                    EData5[i] = new EData5();
+                    EData5[i] = new BPPPTest();
                 }
                 int k = 0;
                 for (int i = 0; i < table.Rows.Count; i++)

@@ -30,7 +30,7 @@ namespace ExcelLib
             _valMin = 0;
             _valMax = 0;
             _valUnit = String.Empty;
-            Input = new In[7];
+            Input = new Contact[7];
             VoltSupply = new VoltSupply();
         }
         public EData3(int inputCount, int inputCount2)
@@ -41,10 +41,10 @@ namespace ExcelLib
             _valMax = 0;
             _valUnit = String.Empty;
             VoltSupply = new VoltSupply();
-            Input = new In[inputCount];
+            Input = new Contact[inputCount];
             for (int i = 0; i < Input.Length; i++)
             {
-                Input[i] = new In();
+                Input[i] = new Contact();
             }
             CurrSource = new currSource[inputCount2];
             for (int i = 0; i < CurrSource.Length; i++)
@@ -58,7 +58,7 @@ namespace ExcelLib
         private double _valMin;
         private double _valMax;
         private string _valUnit;
-        public In[] Input;
+        public Contact[] Input;
         public MultMode MultMode;
         public Control Control;
         public VoltSupply VoltSupply;

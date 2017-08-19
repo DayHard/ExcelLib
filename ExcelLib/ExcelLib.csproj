@@ -72,7 +72,7 @@
     <Compile Include="EData1and2.cs" />
     <Compile Include="EData3.cs" />
     <Compile Include="EData4.cs" />
-    <Compile Include="EData5.cs" />
+    <Compile Include="BPPPTest.cs" />
     <Compile Include="Excel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

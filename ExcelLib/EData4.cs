@@ -5,13 +5,13 @@
         public EData4()
         {
             Index = 0;
-            Input = new In();
-            Output = new Out();
+            Input = new Contact();
+            Output = new Contact();
         }
 
         private int _index;
-        public In Input;
-        public Out Output;
+        public Contact Input;
+        public Contact Output;
 
         public int Index
         {

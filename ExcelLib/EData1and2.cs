@@ -6,15 +6,15 @@ namespace ExcelLib
     {
         private int _index;
         private string _comment;
-        public In Input;
-        public Out Output;
+        public Contact Input;
+        public Contact Output;
 
         public EData1And2()
         {
             _index = 0;
             _comment = String.Empty;
-            Input = new In();
-            Output = new Out();
+            Input = new Contact();
+            Output = new Contact();
         }
         public int Index
         {
@@ -28,12 +28,12 @@ namespace ExcelLib
         }
     }
 
-    public class In
+    public class Contact
     {
         private int _channel;
         private string _device;
 
-        public In()
+        public Contact()
         {
             _channel = 0;
             _device = String.Empty;
@@ -51,27 +51,27 @@ namespace ExcelLib
         }
     }
 
-    public class Out
-    {
-        private int _channel;
-        private string _device;
+    //public class Out
+    //{
+    //    private int _channel;
+    //    private string _device;
 
-        public Out()
-        {
-            Channel = 0;
-            Device = String.Empty;
-        }
+    //    public Out()
+    //    {
+    //        Channel = 0;
+    //        Device = String.Empty;
+    //    }
 
-        public int Channel
-        {
-            get { return _channel; }
-            set { _channel = value; }
-        }
+    //    public int Channel
+    //    {
+    //        get { return _channel; }
+    //        set { _channel = value; }
+    //    }
 
-        public string Device
-        {
-            get { return _device; }
-            set { _device = value; }
-        }
-    }
+    //    public string Device
+    //    {
+    //        get { return _device; }
+    //        set { _device = value; }
+    //    }
+    //}
 }

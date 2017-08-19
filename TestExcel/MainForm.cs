@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Remoting.Channels;
 using System.Windows.Forms;
-using ExcelLib;
+//using ExcelLib;
 
 namespace TestExcel
 {
@@ -25,7 +25,7 @@ namespace TestExcel
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                 var data2 = Excel.ParseEx5(openFileDialog.FileName);
+                // var data2 = Excel.ParseEx5(openFileDialog.FileName);
             }
         }
 
@@ -33,7 +33,7 @@ namespace TestExcel
         {
             //var data  = Excel.ParseEx(path);
             //var data2 = Excel.ParseEx3(path3);
-            var data4 = Excel.ParseEx4(path4);           
+           // var data4 = Excel.ParseEx4(path4);           
         }
     }
 }

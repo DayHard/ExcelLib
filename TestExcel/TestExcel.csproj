@@ -31,8 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExcelLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ExcelLib">
       <HintPath>..\ExcelLib\bin\Debug\ExcelLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
