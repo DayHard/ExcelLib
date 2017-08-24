@@ -6,6 +6,10 @@ using NPOI.SS.UserModel;
 
 namespace ExcelLib
 {
+     public struct MyStruct
+    {
+        
+    }
     public static class Excel
     {
         public static EData1And2[] EData { get; set; }
@@ -695,11 +699,42 @@ namespace ExcelLib
                     }
                 }
 
-
-                EData5 = new BPPPTest[lenght];
-                for (int i = 0; i < EData5.Length; i++)
+                int counter = 0;
+                int[] intSize = new int[lenght];
+                for (int i = 0; i < intSize.Length; i++)
                 {
-                    EData5[i] = new BPPPTest();
+                    while (true)
+                    {
+                        if ((list[1, counter] != String.Empty))
+                        {
+                            intSize[i] = list[1, counter].ToCharArray().Where(x => x == '/').Count();
+                            counter++;
+                            break;
+                        }
+                        counter++;
+                    }
+                }
+                int counter2 = 0;
+                int[] intSize2 = new int[lenght];
+                for (int i = 0; i < intSize2.Length; i++)
+                {
+                    while (true)
+                    {
+                        if (list[2, counter2] != String.Empty)
+                        {
+                            intSize2[i] = list[2, counter2].ToCharArray().Where(x => x == '/').Count();
+                            counter2++;
+                            break;
+                        }
+                        counter2++;
+                    }
+
+                }
+
+                BPPPTest = new BPPPTest[lenght];
+                for (int i = 0; i < BPPPTest.Length; i++)
+                {
+                    BPPPTest[i] = new BPPPTest(intSize[i] + 1, intSize2[i] + 1);
                 }
                 int k = 0;
                 for (int i = 0; i < table.Rows.Count; i++)
@@ -707,31 +742,81 @@ namespace ExcelLib
                     int value;
                     if (list[0, i] != String.Empty && int.TryParse(list[0, i], out value))
                     {
-                        EData5[k].Index = value;
-                        EData5[k].Max = Double.NegativeInfinity; //list[3, i]
-                        EData5[k].Min = Double.NegativeInfinity; //list[4, i]
-                        EData5[k].Value = Double.NegativeInfinity; //list[5, i]
-                        EData5[k].Comment = list[6, i] +" "+ list[7, i];
+                        BPPPTest[k].Index = value;
+                        BPPPTest[k].Max = Double.NegativeInfinity; //list[3, i]
+                        BPPPTest[k].Min = Double.NegativeInfinity; //list[4, i]
+                        BPPPTest[k].Value = Double.NegativeInfinity; //list[5, i]
+                        BPPPTest[k].Comment = list[6, i] +" "+ list[7, i];
 
-                        var indata = list[1, i].Split('r');
-                        var indata2 = indata[0].Split('k');
-                        EData5[k].Input.Device = "R" + indata[1];
-                        EData5[k].Input.Channel = Convert.ToInt32(indata2[1]);
+                        var indata = list[1, i].Split('/');
+                        for (int j = 0; j < BPPPTest[k].Input.Length; j++)
+                        {
+                            var indata2 = indata[j].Split('r');
+                            var indata3 = indata2[0].Split('k');
+                            BPPPTest[k].Input[j].Device = "R" + indata2[1];
+                            BPPPTest[k].Input[j].Channel = Convert.ToInt32(indata3[1]);
+                        }
 
-                        var outdata = list[2, i].Split('r');
-                        var outdata2 = outdata[0].Split('k');
-                        EData5[k].Output.Device = "R" + outdata[1];
-                        EData5[k].Output.Channel = Convert.ToInt32(outdata2[1]);
+                        var outdata = list[2, i].Split('/');
+                        for (int j = 0; j < BPPPTest[k].Output.Length; j++)
+                        {
+                            var outdata2 = outdata[j].Split('r');
+                            var outdata3 = outdata2[0].Split('k');
+                            BPPPTest[k].Output[j].Device = "R" + outdata2[1];
+                            BPPPTest[k].Output[j].Channel = Convert.ToInt32(outdata3[1]);
+                        }
                         k++;
                     }
                 }
-                return EData5;
+                return BPPPTest;
             }
-            catch
+            catch(Exception ex)
             {
                 return null;
             }
         }
+
+        ////Сохраняем Excel5(BPPPTest)
+        ///// <summary>
+        ///// Используется для блока проверки печатных плат, сохраняет тесты в виде таблицы xls (BPPP)
+        ///// </summary>
+        ///// <param name="data"></param>
+        ///// <param name="path"></param>
+        ///// <returns></returns>
+        //public static bool SaveBPPP(BPPPTest[] data, string path)
+        //{
+        //    //DataTable dt = new DataTable();
+        //    //dt.Columns.Add("Номер проверки", typeof(string));
+        //    //dt.Columns.Add("A", typeof(string));
+        //    //dt.Columns.Add("B", typeof(string));
+        //    //dt.Columns.Add("Максимальные допустимые значения", typeof(string));
+        //    //dt.Columns.Add("Измеренные значения", typeof(string));
+        //    //dt.Columns.Add("Комментарий", typeof(string));
+        //    //dt.Rows.Add();
+
+
+        //    //using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        //    //{
+        //    //    IWorkbook wb = new XSSFWorkbook();
+        //    //    ISheet sheet = wb.CreateSheet("Sheet1");
+        //    //    ICreationHelper cH = wb.GetCreationHelper();
+        //    //    for (int i = 0; i < dt.Rows.Count; i++)
+        //    //    {
+        //    //        IRow row = sheet.CreateRow(i);
+        //    //        for (int j = 0; j < 3; j++)
+        //    //        {
+        //    //            ICell cell = row.CreateCell(j);
+        //    //            cell.SetCellValue(cH.CreateRichTextString(dt.Rows[i].ItemArray[j].ToString()));
+        //    //        }
+        //    //    }
+        //    //    wb.Write(stream);
+        //    //}
+
+        //    ExcelFileWriter<int> myExcel = new ExcelWrite();
+        //    myExcel.WriteDateToExcel(@"C:\TEMP\myExcel.xls", myList, "A1", "D1");
+
+        //    return false;
+        //}
     }
 }
 

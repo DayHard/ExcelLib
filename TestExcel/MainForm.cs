@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Runtime.Remoting.Channels;
 using System.Windows.Forms;
-//using ExcelLib;
+using ExcelLib;
+
 
 namespace TestExcel
 {
@@ -25,7 +25,8 @@ namespace TestExcel
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                // var data2 = Excel.ParseEx5(openFileDialog.FileName);
+                 var data2 = Excel.ParseBPPP(openFileDialog.FileName);
+                 //Excel.SaveBPPP(data2, @"C:\Users\Destiny\Desktop\1.xlsx");             
             }
         }
 

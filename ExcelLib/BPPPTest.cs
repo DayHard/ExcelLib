@@ -5,11 +5,20 @@
     /// </summary>
     public class BPPPTest
     {
-        public BPPPTest()
+        public BPPPTest(int sizeIn, int sizeOut)
         {
             Index = 0;
-            Input = new Contact();
-            Output = new Contact();
+            Input = new Contact[sizeIn];
+            for (int i = 0; i < Input.Length; i++)
+            {
+                Input[i] = new Contact();
+            }
+
+            Output = new Contact[sizeOut];
+            for (int i = 0; i < Output.Length; i++)
+            {
+                Output[i] = new Contact();
+            }
         }
 
         private int _index;
@@ -17,8 +26,8 @@
         private double _max;
         private double _value;
         private string _comment;
-        public Contact Input;
-        public Contact Output;
+        public Contact[] Input;
+        public Contact[] Output;
 
         public int Index
         {
