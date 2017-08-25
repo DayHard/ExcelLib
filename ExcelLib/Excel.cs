@@ -2,25 +2,27 @@
 using System.Data;
 using System.IO;
 using System.Linq;
-using MyClass.WriteToExcel;
+using System.Runtime.InteropServices;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using Excel2 = Microsoft.Office.Interop.Excel;
 
 namespace ExcelLib
 {
-     public struct MyStruct
-    {
-        
-    }
     public static class Excel
     {
+
         public static EData1And2[] EData { get; set; }
         public static EData3[] EData3 { get; set; }
         public static EData4[] EData4 { get; set; }
         public static BPPPTest[] BPPPTest { get; set; }
 
-        //Преобразование из XLS к DataTable
+        /// <summary>
+        /// Преобразование из XLS к DataTable
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private static DataTable ParseTable(string path)
         {
             DataTable table;
@@ -282,16 +284,21 @@ namespace ExcelLib
                         {
                             case ".xls":
                                 HSSFWorkbook workbookH = new HSSFWorkbook();
-                                NPOI.HPSF.DocumentSummaryInformation dsi = NPOI.HPSF.PropertySetFactory.CreateDocumentSummaryInformation();
-                                dsi.Company = "Cutcsa"; dsi.Manager = "Departamento Informatico";
+                                NPOI.HPSF.DocumentSummaryInformation dsi = NPOI.HPSF.PropertySetFactory
+                                    .CreateDocumentSummaryInformation();
+                                dsi.Company = "Cutcsa";
+                                dsi.Manager = "Departamento Informatico";
                                 workbookH.DocumentSummaryInformation = dsi;
                                 workbook = workbookH;
                                 break;
 
-                            case ".xlsx": workbook = new XSSFWorkbook(); break;
+                            case ".xlsx":
+                                workbook = new XSSFWorkbook();
+                                break;
                         }
 
-                        worksheet = workbook.CreateSheet(pDatos.TableName); //<-Usa el nombre de la tabla como nombre de la Hoja
+                        worksheet =
+                            workbook.CreateSheet(pDatos.TableName); //<-Usa el nombre de la tabla como nombre de la Hoja
 
                         //CREAR EN LA PRIMERA FILA LOS TITULOS DE LAS COLUMNAS
                         int iRow = 0;
@@ -341,8 +348,14 @@ namespace ExcelLib
                                         {
                                             cell = fila.CreateCell(iCol, CellType.Boolean);
 
-                                            if (Convert.ToBoolean(cellValue)) { cell.SetCellFormula("TRUE()"); }
-                                            else { cell.SetCellFormula("FALSE()"); }
+                                            if (Convert.ToBoolean(cellValue))
+                                            {
+                                                cell.SetCellFormula("TRUE()");
+                                            }
+                                            else
+                                            {
+                                                cell.SetCellFormula("FALSE()");
+                                            }
 
                                             cell.CellStyle = _boolCellStyle;
                                         }
@@ -397,8 +410,14 @@ namespace ExcelLib
 
                                             //Si No tiene valor de Hora, usar formato dd-MM-yyyy
                                             DateTime cDate = Convert.ToDateTime(cellValue);
-                                            if (cDate != null && cDate.Hour > 0) { cell.CellStyle = _dateTimeCellStyle; }
-                                            else { cell.CellStyle = _dateCellStyle; }
+                                            if (cDate != null && cDate.Hour > 0)
+                                            {
+                                                cell.CellStyle = _dateTimeCellStyle;
+                                            }
+                                            else
+                                            {
+                                                cell.CellStyle = _dateCellStyle;
+                                            }
                                         }
                                         break;
                                     default:
@@ -420,9 +439,8 @@ namespace ExcelLib
             }
         }
 
-        //Парсит Excel1 и Excel2
         /// <summary>
-        /// Парсит таблицу типа 1, возвращает список тестов в указанном формате
+        /// Парсит таблицу типа 1 и 2, возвращает список тестов в указанном формате
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -524,7 +542,6 @@ namespace ExcelLib
             }
         }
 
-        //Парсим Excel3
         /// <summary>
         /// Парсит таблицу типа 3, возвращает список тестов в указанном формате
         /// </summary>
@@ -751,7 +768,6 @@ namespace ExcelLib
             }
         }
 
-        //Парсим Excel4
         /// <summary>
         /// Парсит таблицу типа 4, возвращает список тестов в указанном формате
         /// </summary>
@@ -798,7 +814,7 @@ namespace ExcelLib
                 for (int i = 0; i < table.Rows.Count; i++)
                 {
                     int value;
-                    if (list[0,i] != String.Empty && int.TryParse(list[0,i], out value))
+                    if (list[0, i] != String.Empty && int.TryParse(list[0, i], out value))
                     {
                         EData4[k].Index = value;
 
@@ -822,7 +838,6 @@ namespace ExcelLib
             }
         }
 
-        //Парсим Excel5
         /// <summary>
         /// Используется для блока проверки печатных плат, возвращает тесты ввиде массива (BPPP)
         /// </summary>
@@ -906,7 +921,7 @@ namespace ExcelLib
                         BPPPTest[k].Max = Double.NegativeInfinity; //list[3, i]
                         BPPPTest[k].Min = Double.NegativeInfinity; //list[4, i]
                         BPPPTest[k].Value = Double.NegativeInfinity; //list[5, i]
-                        BPPPTest[k].Comment = list[6, i] +" "+ list[7, i];
+                        BPPPTest[k].Comment = list[6, i] + " " + list[7, i];
                         BPPPTest[k].Range = Convert.ToInt32(list[8, i]);
 
                         var indata = list[1, i].Split('/');
@@ -931,137 +946,295 @@ namespace ExcelLib
                 }
                 return BPPPTest;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
         }
 
-        //Сохраняем Excel5(BPPPTest)
         /// <summary>
         /// Используется для блока проверки печатных плат, сохраняет тесты в виде таблицы xls (BPPP)
         /// </summary>
         /// <param name="data"></param>
         /// <param name="path"></param>
         /// <returns></returns>
+
         public static bool SaveBPPP(BPPPTest[] data, string path)
         {
-            DataTable _myDataTable = new DataTable();
-
-
-            _myDataTable.Columns.Add(new DataColumn("Номер проверки"));
-            _myDataTable.Columns.Add(new DataColumn("A"));
-            _myDataTable.Columns.Add(new DataColumn("B"));
-            _myDataTable.Columns.Add(new DataColumn("Максимальные допустимые значания"));
-            _myDataTable.Columns.Add(new DataColumn(String.Empty));
-            _myDataTable.Columns.Add(new DataColumn("Измеренные значения"));
-            _myDataTable.Columns.Add(new DataColumn("Комментарии"));
-            _myDataTable.Columns.Add(new DataColumn(String.Empty));
-
-            string[] myResult = { "", "", "", "MIN", "MAX", "", "A", "B" };
-            DataRow row1 = _myDataTable.NewRow();
-
-            DataRow _row = _myDataTable.NewRow();
-            for (int i = 0; i < myResult.Length; i++)
+            try
             {
-                row1[i] = myResult[i];
-            }
-            _myDataTable.Rows.Add(row1);
+                path = @"C:\Users\Destiny\Desktop\SAVETEST.xls";
 
-            for (int i = 0; i < data.Length; i++)
+                Excel2.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
+                xlApp.Visible = false;
+                xlApp.ScreenUpdating = false;
+
+                Excel2.Workbook xlWorkBook;
+                Excel2.Worksheet xlWorkSheet;
+                object misValue = System.Reflection.Missing.Value;
+
+                xlWorkBook = xlApp.Workbooks.Add(misValue);
+                xlWorkSheet = (Excel2.Worksheet)xlWorkBook.Worksheets.Item[1];
+
+                string[ , ] arr = new string[data.Length + 3, 9];
+                arr[0, 0] = "Номер проверки";
+                arr[0, 1] = "A";
+                arr[0, 2] = "B";
+                arr[0, 3] = "Максимальные допустимые значения";
+                arr[1, 3] = "MIN";
+                arr[1, 4] = "MAX";
+                arr[0, 5] = "Измеренные значения";
+                arr[0, 6] = "Комментарии";
+                arr[1, 6] = "A";
+                arr[1, 7] = "B";
+                arr[0, 8] = "Диапазон";
+                arr[1, 8] = "Ом";
+
+                int k = 0;
+                for (int i = 2; i < data.Length + 2; i++)
+                {
+                    arr[i, 0] = data[k].Index.ToString();
+
+                    for (int j = 0; j < data[k].Input.Length; j++)
+                    {
+                        if (j > 0) arr[i, 1] += "/";
+                       arr[i, 1] += "K" + data[k].Input[j].Channel + data[k].Input[j].Device;
+                    }
+
+                    for (int j = 0; j < data[k].Output.Length; j++)
+                    {
+                        if (j > 0) arr[i, 2] += "/";
+                        arr[i, 2] += "K" + data[k].Output[j].Channel + data[k].Output[j].Device;
+                    }
+                    arr[i, 3] = data[k].Min.ToString();
+                    arr[i, 4] = data[k].Max.ToString();
+                    arr[i, 5] = data[k].Value.ToString();
+                    var tcom = data[k].Comment.Split(' ');
+                    arr[i, 6] = tcom[0];
+                    arr[i, 7] = tcom[1];
+                    arr[i, 8] = data[k].Range.ToString();
+                    k++;
+                }
+
+                Excel2.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1,1],xlWorkSheet.Cells[data.Length + 2, 9]];
+                r.Value = arr;
+ 
+                xlWorkBook.SaveAs(path, Excel2.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel2.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+                xlWorkBook.Close(true, misValue, misValue);
+                xlApp.Quit();
+
+                Marshal.ReleaseComObject(xlWorkSheet);
+                Marshal.ReleaseComObject(xlWorkBook);
+                Marshal.ReleaseComObject(xlApp);
+
+
+                return true;
+            }
+            catch (Exception ex)
             {
-                _row[i] = data[i];
+                return false;
             }
-            _myDataTable.Rows.Add(_row);
-
-            //dt.Rows[0][0] = @"Номер проверки";
-            //dt.Rows[0][1] = @"A";
-            //dt.Rows[0][2] = @"B";
-            //dt.Rows[0][3] = @"Максимальные допустимые значания";
-            //dt.Rows[0][5] = @"Измеренные значения";
-            //dt.Rows[0][6] = @"Комментарии";
-
-            //dt.Rows[1][3] = @"MIN";
-            //dt.Rows[1][4] = @"MAX";
-            //dt.Rows[1][6] = @"A";
-            //dt.Rows[1][7] = @"B";
-
-            //for (int j = 0; j < data.Length; j++)
-            //{
-            //    // create a DataRow using .NewRow()
-            //    DataRow row = _myDataTable.NewRow();
-
-            //    //// iterate over all columns to fill the row
-            //    //for (int i = 0; i < ele; i++)
-            //    //{
-            //    //    row[i] = datar[i, j];
-            //    //}
-
-            //    // add the current row to the DataTable
-            //    _myDataTable.Rows.Add(row);
-            //}
-
-            //DataTable dt = new DataTable();
-            //dt.Rows.Clear();
-            //dt.Columns.Clear();
-            //dt.Rows.a
-
-            //// Declare variables for DataColumn and DataRow objects.
-            //DataColumn column;
-            //DataRow row;
-
-            //dt.Rows[0][0] = @"Номер проверки";
-            //dt.Rows[0][1] = @"A";
-            //dt.Rows[0][2] = @"B";
-            //dt.Rows[0][3] = @"Максимальные допустимые значания";
-            //dt.Rows[0][5] = @"Измеренные значения";
-            //dt.Rows[0][6] = @"Комментарии";
-
-            //dt.Rows[1][3] = @"MIN";
-            //dt.Rows[1][4] = @"MAX";
-            //dt.Rows[1][6] = @"A";
-            //dt.Rows[1][7] = @"B";
-
-            //int k = 0;
-            //int z = 0;
-            //for (int i = 2; i < dt.Rows.Count; i++)
-            //{
-            //    for (int j = 0; j < dt.Columns.Count; j++)
-            //    {
-            //        //dt.Rows[i][0] = data[k].Index;
-            //        // dt.Rows[i][1] = data[k].
-            //    }
-            //}
-            //dt.Columns.Add("Номер проверки", typeof(string));
-            //dt.Columns.Add("A", typeof(string));
-            //dt.Columns.Add("B", typeof(string));
-            //dt.Columns.Add("Максимальные допустимые значения", typeof(string));
-            //dt.Columns.Add("Измеренные значения", typeof(string));
-            //dt.Columns.Add("Комментарий", typeof(string));
-            //dt.Rows.Add();
-
-
-            //using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
-            //{
-            //    IWorkbook wb = new XSSFWorkbook();
-            //    ISheet sheet = wb.CreateSheet("Sheet1");
-            //    ICreationHelper cH = wb.GetCreationHelper();
-            //    for (int i = 0; i < dt.Rows.Count; i++)
-            //    {
-            //        IRow row = sheet.CreateRow(i);
-            //        for (int j = 0; j < 3; j++)
-            //        {
-            //            ICell cell = row.CreateCell(j);
-            //            cell.SetCellValue(cH.CreateRichTextString(dt.Rows[i].ItemArray[j].ToString()));
-            //        }
-            //    }
-            //    wb.Write(stream);
-            //}
-
-            SaveTable(_myDataTable, path);
-
-            return false;
         }
+        //public static bool SaveBPPP(BPPPTest[] data, string path)
+        //{
+        //    //string fileName = System.Windows.Forms.Application.StartupPath + "\\" + "Excel" + ".xlsx",
+        //    //    fileName_new = System.Windows.Forms.Application.StartupPath + "\\" + "Excel_new" + ".xlsx";
+        //    path = @"C:\Users\Destiny\Desktop\2.xls";
+        //    string fileName = path;
+        //    string fileName_new = path;
+
+        //    try
+        //    {
+        //        //Приложение самого Excel
+        //        Excel2.Application excelapp = new Excel2.Application();
+        //        excelapp.Visible = false;
+        //        //Книга.
+        //        Excel2.Workbooks excelappworkbooks = excelapp.Workbooks;
+        //        excelapp.Workbooks.Open(path);
+        //        //excelapp.Workbooks.Open(fileName,
+        //        //    Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+        //        //    Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+        //        //    Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+        //        //    Type.Missing, Type.Missing);
+        //        Excel2.Workbook excelappworkbook = excelappworkbooks[1];
+        //        //Получаем массив ссылок на листы выбранной книги
+        //        Excel2.Sheets excelsheets = excelappworkbook.Worksheets;
+        //        //Выбираем лист 1
+        //        Excel2.Worksheet excelworksheet = (Excel2.Worksheet) excelsheets.get_Item(1);
+
+        //        ////Выбираем ячейку для вывода A1
+        //        Excel2.Range excelcells = excelworksheet.get_Range("A1", "I" + (data.Length + 2));
+        //        ////Выводим число
+        //        //excelcells.Value2 = 10.5;
+
+        //        ////Выбираем лист 2
+        //        //excelworksheet = (Excel2.Worksheet)excelsheets.get_Item(2);
+        //        ////При выборе одной ячейки можно не указывать вторую границу 
+        //        //excelcells = excelworksheet.get_Range("A1", Type.Missing);
+        //        ////Выводим значение текстовую строку
+        //        //excelcells.Value2 = "Лист 2";
+        //        //excelcells.Font.Size = 20;
+        //        //excelcells.Font.Italic = true;
+        //        //excelcells.Font.Bold = true;
+        //        ////Выбираем лист 3
+        //        //excelworksheet = (Excel2.Worksheet)excelsheets.get_Item(3);
+        //        ////Делаем третий лист активным
+        //        excelworksheet.Activate();
+        //        //Вывод в ячейки используя номер строки и столбца Cells[строка, столбец]
+        //        excelworksheet.Cells[1, 1] = @"Номер проверки";
+        //        excelworksheet.Cells[1, 2] = @"A";
+        //        excelworksheet.Cells[1, 3] = @"B";
+
+        //        for (int m = 3; m < 30; m++)
+        //        {
+        //            for (int n = 1; n < 9; n++)
+        //            {
+        //                excelcells = (Excel2.Range) excelworksheet.Cells[m, n];
+        //                excelworksheet.Cells[m, n] = data[m].Index;
+        //                //Выводим координаты ячеек
+        //                // excelcells.Value2 = m.ToString() + " " + n.ToString();
+        //            }
+        //        }
+
+        //        excelworksheet.Activate();
+        //        //excelworksheet = (Excel2.Worksheet) excelsheets.get_Item(1);
+        //        //for (int m = 1; m < 20; m++)
+        //        //{
+        //        //    for (int n = 1; n < 15; n++)
+        //        //    {
+        //        //        excelcells = (Excel2.Range) excelworksheet.Cells[m, n];
+        //        //        //Выводим координаты ячеек
+        //        //        excelcells.Value2 = m.ToString() + " " + n.ToString();
+        //        //    }
+        //        //}
+
+        //        excelworksheet.SaveAs(fileName_new);
+
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return false;
+        //    }
+        //}
     }
 }
+//public static bool SaveBPPP(BPPPTest[] data, string path)
+        //{
+        //    DataTable _myDataTable = new DataTable();
+
+
+        //    _myDataTable.Columns.Add(new DataColumn("Номер проверки"));
+        //    _myDataTable.Columns.Add(new DataColumn("A"));
+        //    _myDataTable.Columns.Add(new DataColumn("B"));
+        //    _myDataTable.Columns.Add(new DataColumn("Максимальные допустимые значания"));
+        //    _myDataTable.Columns.Add(new DataColumn(String.Empty));
+        //    _myDataTable.Columns.Add(new DataColumn("Измеренные значения"));
+        //    _myDataTable.Columns.Add(new DataColumn("Комментарии"));
+        //    _myDataTable.Columns.Add(new DataColumn(String.Empty));
+
+        //    string[] myResult = { "", "", "", "MIN", "MAX", "", "A", "B" };
+        //    DataRow row1 = _myDataTable.NewRow();
+
+        //    DataRow _row = _myDataTable.NewRow();
+        //    for (int i = 0; i < myResult.Length; i++)
+        //    {
+        //        row1[i] = myResult[i];
+        //    }
+        //    _myDataTable.Rows.Add(row1);
+
+        //    for (int i = 0; i < data.Length; i++)
+        //    {
+        //        _row[i] = data[i];
+        //    }
+        //    _myDataTable.Rows.Add(_row);
+
+        //    //dt.Rows[0][0] = @"Номер проверки";
+        //    //dt.Rows[0][1] = @"A";
+        //    //dt.Rows[0][2] = @"B";
+        //    //dt.Rows[0][3] = @"Максимальные допустимые значания";
+        //    //dt.Rows[0][5] = @"Измеренные значения";
+        //    //dt.Rows[0][6] = @"Комментарии";
+
+        //    //dt.Rows[1][3] = @"MIN";
+        //    //dt.Rows[1][4] = @"MAX";
+        //    //dt.Rows[1][6] = @"A";
+        //    //dt.Rows[1][7] = @"B";
+
+        //    //for (int j = 0; j < data.Length; j++)
+        //    //{
+        //    //    // create a DataRow using .NewRow()
+        //    //    DataRow row = _myDataTable.NewRow();
+
+        //    //    //// iterate over all columns to fill the row
+        //    //    //for (int i = 0; i < ele; i++)
+        //    //    //{
+        //    //    //    row[i] = datar[i, j];
+        //    //    //}
+
+        //    //    // add the current row to the DataTable
+        //    //    _myDataTable.Rows.Add(row);
+        //    //}
+
+        //    //DataTable dt = new DataTable();
+        //    //dt.Rows.Clear();
+        //    //dt.Columns.Clear();
+        //    //dt.Rows.a
+
+        //    //// Declare variables for DataColumn and DataRow objects.
+        //    //DataColumn column;
+        //    //DataRow row;
+
+        //    //dt.Rows[0][0] = @"Номер проверки";
+        //    //dt.Rows[0][1] = @"A";
+        //    //dt.Rows[0][2] = @"B";
+        //    //dt.Rows[0][3] = @"Максимальные допустимые значания";
+        //    //dt.Rows[0][5] = @"Измеренные значения";
+        //    //dt.Rows[0][6] = @"Комментарии";
+
+        //    //dt.Rows[1][3] = @"MIN";
+        //    //dt.Rows[1][4] = @"MAX";
+        //    //dt.Rows[1][6] = @"A";
+        //    //dt.Rows[1][7] = @"B";
+
+        //    //int k = 0;
+        //    //int z = 0;
+        //    //for (int i = 2; i < dt.Rows.Count; i++)
+        //    //{
+        //    //    for (int j = 0; j < dt.Columns.Count; j++)
+        //    //    {
+        //    //        //dt.Rows[i][0] = data[k].Index;
+        //    //        // dt.Rows[i][1] = data[k].
+        //    //    }
+        //    //}
+        //    //dt.Columns.Add("Номер проверки", typeof(string));
+        //    //dt.Columns.Add("A", typeof(string));
+        //    //dt.Columns.Add("B", typeof(string));
+        //    //dt.Columns.Add("Максимальные допустимые значения", typeof(string));
+        //    //dt.Columns.Add("Измеренные значения", typeof(string));
+        //    //dt.Columns.Add("Комментарий", typeof(string));
+        //    //dt.Rows.Add();
+
+
+        //    //using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+        //    //{
+        //    //    IWorkbook wb = new XSSFWorkbook();
+        //    //    ISheet sheet = wb.CreateSheet("Sheet1");
+        //    //    ICreationHelper cH = wb.GetCreationHelper();
+        //    //    for (int i = 0; i < dt.Rows.Count; i++)
+        //    //    {
+        //    //        IRow row = sheet.CreateRow(i);
+        //    //        for (int j = 0; j < 3; j++)
+        //    //        {
+        //    //            ICell cell = row.CreateCell(j);
+        //    //            cell.SetCellValue(cH.CreateRichTextString(dt.Rows[i].ItemArray[j].ToString()));
+        //    //        }
+        //    //    }
+        //    //    wb.Write(stream);
+        //    //}
+
+        //    SaveTable(_myDataTable, path);
+
+        //    return false;
+        //}
 
