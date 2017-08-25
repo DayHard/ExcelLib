@@ -1,4 +1,6 @@
-﻿namespace ExcelLib
+﻿using Microsoft.Office.Interop.Excel;
+
+namespace ExcelLib
 {
     /// <summary>
     /// Один тест соотвествующий каждой строке таблицы Excel файла. Для BPPP.
@@ -26,6 +28,7 @@
         private double _max;
         private double _value;
         private string _comment;
+        private int _range;
         public Contact[] Input;
         public Contact[] Output;
 
@@ -57,6 +60,12 @@
         {
             get { return _comment; }
             set { _comment = value; }
+        }
+
+        public int Range
+        {
+            get { return _range; }
+            set { _range = value; }
         }
     }
 }
