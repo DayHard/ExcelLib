@@ -23,10 +23,14 @@ namespace TestExcel
 
         private void btnClickMe_Click(object sender, EventArgs e)
         {
+            BPPPTest[] BPPPTest = null;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                 var data2 = Excel.ParseBPPP(openFileDialog.FileName);
-                 var status = Excel.SaveBPPP(data2, @"C:\Users\Destiny\Desktop\1.xlsx");             
+                 BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);     
+            }
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
             }
         }
 

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using Excel2 = Microsoft.Office.Interop.Excel;
+using MSExcel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelLib
 {
@@ -499,20 +499,22 @@ namespace ExcelLib
                                 {
                                     if (i == 1)
                                     {
+                                        list[i, j] = list[i, j].ToLower();
                                         string[] chandev = list[i, j].Split('/');
-                                        string[] chandev2 = chandev[1].Split('R');
-                                        string[] chandev3 = chandev2[0].Split('K');
+                                        string[] chandev2 = chandev[1].Split('r');
+                                        string[] chandev3 = chandev2[0].Split('k');
                                         EData[k].Input.Channel = int.Parse(chandev3[1]);
-                                        EData[k].Input.Device = "R" + chandev2[1];
+                                        EData[k].Input.Device = "r" + chandev2[1];
                                         EData[k].Comment = tabHeader[i] + " " + chandev[0] + ", ";
                                     }
                                     else
                                     {
+                                        list[i, j] = list[i, j].ToLower();
                                         string[] chandev = list[i, j].Split('/');
-                                        string[] chandev2 = chandev[1].Split('R');
-                                        string[] chandev3 = chandev2[0].Split('K');
+                                        string[] chandev2 = chandev[1].Split('r');
+                                        string[] chandev3 = chandev2[0].Split('k');
                                         EData[k].Output.Channel = int.Parse(chandev3[1]);
-                                        EData[k].Output.Device = "R" + chandev2[1];
+                                        EData[k].Output.Device = "r" + chandev2[1];
 
                                         string[] chaldev = list[i, j].Split('/');
                                         EData[k].Comment += tabHeader[i] + " " + chaldev[0];
@@ -667,12 +669,13 @@ namespace ExcelLib
                             EData3[k].VoltSupply.V2 = Convert.ToInt32(voltage[1]);
                         }
 
+                        list[4, i] = list[4, i].ToLower();
                         var device = list[4, i].Split('/');
                         for (int j = 0; j < EData3[k].Input.Length; j++)
                         {
-                            var device2 = device[j].Split('R');
-                            var device3 = device2[0].Split('K');
-                            EData3[k].Input[j].Device = @"R" + device2[1];
+                            var device2 = device[j].Split('r');
+                            var device3 = device2[0].Split('k');
+                            EData3[k].Input[j].Device = @"r" + device2[1];
                             if (device3[0] != String.Empty)
                             {
                                 EData3[k].Input[j].Channel = Convert.ToInt32(device3[0]);
@@ -818,14 +821,16 @@ namespace ExcelLib
                     {
                         EData4[k].Index = value;
 
+                        list[1, i] = list[1, i].ToLower();
                         var indata = list[1, i].Split('r');
                         var indata2 = indata[0].Split('k');
-                        EData4[k].Input.Device = "R" + indata[1];
+                        EData4[k].Input.Device = "r" + indata[1];
                         EData4[k].Input.Channel = Convert.ToInt32(indata2[1]);
 
+                        list[2, i] = list[2, i].ToLower();
                         var outdata = list[2, i].Split('r');
                         var outdata2 = outdata[0].Split('k');
-                        EData4[k].Output.Device = "R" + outdata[1];
+                        EData4[k].Output.Device = "r" + outdata[1];
                         EData4[k].Output.Channel = Convert.ToInt32(outdata2[1]);
                         k++;
                     }
@@ -924,21 +929,23 @@ namespace ExcelLib
                         BPPPTest[k].Comment = list[6, i] + " " + list[7, i];
                         BPPPTest[k].Range = Convert.ToInt32(list[8, i]);
 
+                        list[1,i] = list[1, i].ToLower();
                         var indata = list[1, i].Split('/');
                         for (int j = 0; j < BPPPTest[k].Input.Length; j++)
                         {
                             var indata2 = indata[j].Split('r');
                             var indata3 = indata2[0].Split('k');
-                            BPPPTest[k].Input[j].Device = "R" + indata2[1];
+                            BPPPTest[k].Input[j].Device = "r" + indata2[1];
                             BPPPTest[k].Input[j].Channel = Convert.ToInt32(indata3[1]);
                         }
 
+                        list[2, i] = list[2, i].ToLower();
                         var outdata = list[2, i].Split('/');
                         for (int j = 0; j < BPPPTest[k].Output.Length; j++)
                         {
                             var outdata2 = outdata[j].Split('r');
                             var outdata3 = outdata2[0].Split('k');
-                            BPPPTest[k].Output[j].Device = "R" + outdata2[1];
+                            BPPPTest[k].Output[j].Device = "r" + outdata2[1];
                             BPPPTest[k].Output[j].Channel = Convert.ToInt32(outdata3[1]);
                         }
                         k++;
@@ -958,283 +965,124 @@ namespace ExcelLib
         /// <param name="data"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-
-        public static bool SaveBPPP(BPPPTest[] data, string path)
+        public static string SaveBPPP(BPPPTest[] data, string path)
         {
             try
             {
-                path = @"C:\Users\Destiny\Desktop\SAVETEST.xls";
-
-                Excel2.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-                xlApp.Visible = false;
-                xlApp.ScreenUpdating = false;
-
-                Excel2.Workbook xlWorkBook;
-                Excel2.Worksheet xlWorkSheet;
-                object misValue = System.Reflection.Missing.Value;
-
-                xlWorkBook = xlApp.Workbooks.Add(misValue);
-                xlWorkSheet = (Excel2.Worksheet)xlWorkBook.Worksheets.Item[1];
-
-                string[ , ] arr = new string[data.Length + 3, 9];
-                arr[0, 0] = "Номер проверки";
-                arr[0, 1] = "A";
-                arr[0, 2] = "B";
-                arr[0, 3] = "Максимальные допустимые значения";
-                arr[1, 3] = "MIN";
-                arr[1, 4] = "MAX";
-                arr[0, 5] = "Измеренные значения";
-                arr[0, 6] = "Комментарии";
-                arr[1, 6] = "A";
-                arr[1, 7] = "B";
-                arr[0, 8] = "Диапазон";
-                arr[1, 8] = "Ом";
-
-                int k = 0;
-                for (int i = 2; i < data.Length + 2; i++)
-                {
-                    arr[i, 0] = data[k].Index.ToString();
-
-                    for (int j = 0; j < data[k].Input.Length; j++)
-                    {
-                        if (j > 0) arr[i, 1] += "/";
-                       arr[i, 1] += "K" + data[k].Input[j].Channel + data[k].Input[j].Device;
-                    }
-
-                    for (int j = 0; j < data[k].Output.Length; j++)
-                    {
-                        if (j > 0) arr[i, 2] += "/";
-                        arr[i, 2] += "K" + data[k].Output[j].Channel + data[k].Output[j].Device;
-                    }
-                    arr[i, 3] = data[k].Min.ToString();
-                    arr[i, 4] = data[k].Max.ToString();
-                    arr[i, 5] = data[k].Value.ToString();
-                    var tcom = data[k].Comment.Split(' ');
-                    arr[i, 6] = tcom[0];
-                    arr[i, 7] = tcom[1];
-                    arr[i, 8] = data[k].Range.ToString();
-                    k++;
-                }
-
-                Excel2.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1,1],xlWorkSheet.Cells[data.Length + 2, 9]];
-                r.Value = arr;
- 
-                xlWorkBook.SaveAs(path, Excel2.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel2.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
-                xlWorkBook.Close(true, misValue, misValue);
-                xlApp.Quit();
-
-                Marshal.ReleaseComObject(xlWorkSheet);
-                Marshal.ReleaseComObject(xlWorkBook);
-                Marshal.ReleaseComObject(xlApp);
-
-
-                return true;
+                string status = Wrapper.SaveBPPPWrapper(data, path);
+                return status;
             }
             catch (Exception ex)
             {
-                return false;
+                return ex.Message;
+            }
+            finally
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
-        //public static bool SaveBPPP(BPPPTest[] data, string path)
-        //{
-        //    //string fileName = System.Windows.Forms.Application.StartupPath + "\\" + "Excel" + ".xlsx",
-        //    //    fileName_new = System.Windows.Forms.Application.StartupPath + "\\" + "Excel_new" + ".xlsx";
-        //    path = @"C:\Users\Destiny\Desktop\2.xls";
-        //    string fileName = path;
-        //    string fileName_new = path;
+    }
 
-        //    try
-        //    {
-        //        //Приложение самого Excel
-        //        Excel2.Application excelapp = new Excel2.Application();
-        //        excelapp.Visible = false;
-        //        //Книга.
-        //        Excel2.Workbooks excelappworkbooks = excelapp.Workbooks;
-        //        excelapp.Workbooks.Open(path);
-        //        //excelapp.Workbooks.Open(fileName,
-        //        //    Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-        //        //    Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-        //        //    Type.Missing, Type.Missing, Type.Missing, Type.Missing,
-        //        //    Type.Missing, Type.Missing);
-        //        Excel2.Workbook excelappworkbook = excelappworkbooks[1];
-        //        //Получаем массив ссылок на листы выбранной книги
-        //        Excel2.Sheets excelsheets = excelappworkbook.Worksheets;
-        //        //Выбираем лист 1
-        //        Excel2.Worksheet excelworksheet = (Excel2.Worksheet) excelsheets.get_Item(1);
+    /// <summary>
+    /// Не использовать данный класс.
+    /// </summary>
+    // Необходим для очистки COM объектом
+    public static class Wrapper
+    {
+        public static string SaveBPPPWrapper(BPPPTest[] data, string path)
+        {
+            MSExcel.Application exApp = new MSExcel.Application();
 
-        //        ////Выбираем ячейку для вывода A1
-        //        Excel2.Range excelcells = excelworksheet.get_Range("A1", "I" + (data.Length + 2));
-        //        ////Выводим число
-        //        //excelcells.Value2 = 10.5;
+            exApp.Visible = false;
+            exApp.ScreenUpdating = false;
+            // Отключае запрос на перезапись файла (разрешает перезапись)
+            exApp.DisplayAlerts = false;
 
-        //        ////Выбираем лист 2
-        //        //excelworksheet = (Excel2.Worksheet)excelsheets.get_Item(2);
-        //        ////При выборе одной ячейки можно не указывать вторую границу 
-        //        //excelcells = excelworksheet.get_Range("A1", Type.Missing);
-        //        ////Выводим значение текстовую строку
-        //        //excelcells.Value2 = "Лист 2";
-        //        //excelcells.Font.Size = 20;
-        //        //excelcells.Font.Italic = true;
-        //        //excelcells.Font.Bold = true;
-        //        ////Выбираем лист 3
-        //        //excelworksheet = (Excel2.Worksheet)excelsheets.get_Item(3);
-        //        ////Делаем третий лист активным
-        //        excelworksheet.Activate();
-        //        //Вывод в ячейки используя номер строки и столбца Cells[строка, столбец]
-        //        excelworksheet.Cells[1, 1] = @"Номер проверки";
-        //        excelworksheet.Cells[1, 2] = @"A";
-        //        excelworksheet.Cells[1, 3] = @"B";
+            MSExcel.Workbook xlWorkBook;
+            MSExcel.Worksheet xlWorkSheet;
+            object misValue = System.Reflection.Missing.Value;
 
-        //        for (int m = 3; m < 30; m++)
-        //        {
-        //            for (int n = 1; n < 9; n++)
-        //            {
-        //                excelcells = (Excel2.Range) excelworksheet.Cells[m, n];
-        //                excelworksheet.Cells[m, n] = data[m].Index;
-        //                //Выводим координаты ячеек
-        //                // excelcells.Value2 = m.ToString() + " " + n.ToString();
-        //            }
-        //        }
+            xlWorkBook = exApp.Workbooks.Add(misValue);
+            xlWorkSheet = (MSExcel.Worksheet)xlWorkBook.Worksheets.Item[1];
 
-        //        excelworksheet.Activate();
-        //        //excelworksheet = (Excel2.Worksheet) excelsheets.get_Item(1);
-        //        //for (int m = 1; m < 20; m++)
-        //        //{
-        //        //    for (int n = 1; n < 15; n++)
-        //        //    {
-        //        //        excelcells = (Excel2.Range) excelworksheet.Cells[m, n];
-        //        //        //Выводим координаты ячеек
-        //        //        excelcells.Value2 = m.ToString() + " " + n.ToString();
-        //        //    }
-        //        //}
+            string[,] arr = new string[data.Length + 3, 9];
+            arr[0, 0] = "Номер проверки";
+            arr[0, 1] = "A";
+            arr[0, 2] = "B";
+            arr[0, 3] = "Максимальные допустимые значения";
+            arr[0, 4] = " ";
+            arr[1, 3] = "MIN";
+            arr[1, 4] = "MAX";
+            arr[0, 5] = "Измеренные значения";
+            arr[0, 6] = "Комментарии";
+            arr[1, 6] = "A";
+            arr[0, 7] = " ";
+            arr[1, 7] = "B";
+            arr[0, 8] = "Диапазон";
+            arr[1, 8] = "Ом";
 
-        //        excelworksheet.SaveAs(fileName_new);
+            int k = 0;
+            for (int i = 2; i < data.Length + 2; i++)
+            {
+                arr[i, 0] = data[k].Index.ToString();
 
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return false;
-        //    }
-        //}
+                for (int j = 0; j < data[k].Input.Length; j++)
+                {
+                    if (j > 0) arr[i, 1] += "/";
+                    arr[i, 1] += "k" + data[k].Input[j].Channel + data[k].Input[j].Device;
+                }
+
+                for (int j = 0; j < data[k].Output.Length; j++)
+                {
+                    if (j > 0) arr[i, 2] += "/";
+                    arr[i, 2] += "k" + data[k].Output[j].Channel + data[k].Output[j].Device;
+                }
+
+                arr[i, 3] = data[k].Min.ToString();
+                arr[i, 4] = data[k].Max.ToString();
+                arr[i, 5] = data[k].Value.ToString();
+                var tcom = data[k].Comment.Split(' ');
+                arr[i, 6] = tcom[0];
+                arr[i, 7] = tcom[1];
+                arr[i, 8] = data[k].Range.ToString();
+                k++;
+            }
+            try
+            {
+                MSExcel.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[data.Length + 2, 9]];
+                r.Value = arr;
+
+
+                /*
+                xlWorkSheet.get_Range(FirstRange, LastRange).EntireColumn.AutoFit(); //для столбца
+                xlWorkSheet.get_Range(FirstRange, LastRange).EntireRow.AutoFit();//для строки
+                 */
+                //xlWorkSheet.get_Range("A1", xlWorkBook.Sheets[1].Cells.SpecialCells(MSExcel.XlCellType.xlCellTypeLastCell).Column).EntireColumn.AutoFit(); //для столбца
+                //xlWorkSheet.get_Range("A1", xlWorkBook.Sheets[1].Cells.SpecialCells(MSExcel.XlCellType.xlCellTypeLastCell).Row).EntireRow.AutoFit();//для строки
+
+                xlWorkBook.SaveAs(path, MSExcel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue,
+                MSExcel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                switch (ex.Message)
+                {
+                    default:
+                        return "Unknown error: " + ex.Message;
+                }
+            }
+            finally
+            {
+                xlWorkBook.Close(true, misValue, misValue);
+                exApp.Quit();
+
+                Marshal.ReleaseComObject(xlWorkSheet);
+                Marshal.ReleaseComObject(xlWorkBook);
+                Marshal.ReleaseComObject(exApp);
+            }
+        }
     }
 }
-//public static bool SaveBPPP(BPPPTest[] data, string path)
-        //{
-        //    DataTable _myDataTable = new DataTable();
-
-
-        //    _myDataTable.Columns.Add(new DataColumn("Номер проверки"));
-        //    _myDataTable.Columns.Add(new DataColumn("A"));
-        //    _myDataTable.Columns.Add(new DataColumn("B"));
-        //    _myDataTable.Columns.Add(new DataColumn("Максимальные допустимые значания"));
-        //    _myDataTable.Columns.Add(new DataColumn(String.Empty));
-        //    _myDataTable.Columns.Add(new DataColumn("Измеренные значения"));
-        //    _myDataTable.Columns.Add(new DataColumn("Комментарии"));
-        //    _myDataTable.Columns.Add(new DataColumn(String.Empty));
-
-        //    string[] myResult = { "", "", "", "MIN", "MAX", "", "A", "B" };
-        //    DataRow row1 = _myDataTable.NewRow();
-
-        //    DataRow _row = _myDataTable.NewRow();
-        //    for (int i = 0; i < myResult.Length; i++)
-        //    {
-        //        row1[i] = myResult[i];
-        //    }
-        //    _myDataTable.Rows.Add(row1);
-
-        //    for (int i = 0; i < data.Length; i++)
-        //    {
-        //        _row[i] = data[i];
-        //    }
-        //    _myDataTable.Rows.Add(_row);
-
-        //    //dt.Rows[0][0] = @"Номер проверки";
-        //    //dt.Rows[0][1] = @"A";
-        //    //dt.Rows[0][2] = @"B";
-        //    //dt.Rows[0][3] = @"Максимальные допустимые значания";
-        //    //dt.Rows[0][5] = @"Измеренные значения";
-        //    //dt.Rows[0][6] = @"Комментарии";
-
-        //    //dt.Rows[1][3] = @"MIN";
-        //    //dt.Rows[1][4] = @"MAX";
-        //    //dt.Rows[1][6] = @"A";
-        //    //dt.Rows[1][7] = @"B";
-
-        //    //for (int j = 0; j < data.Length; j++)
-        //    //{
-        //    //    // create a DataRow using .NewRow()
-        //    //    DataRow row = _myDataTable.NewRow();
-
-        //    //    //// iterate over all columns to fill the row
-        //    //    //for (int i = 0; i < ele; i++)
-        //    //    //{
-        //    //    //    row[i] = datar[i, j];
-        //    //    //}
-
-        //    //    // add the current row to the DataTable
-        //    //    _myDataTable.Rows.Add(row);
-        //    //}
-
-        //    //DataTable dt = new DataTable();
-        //    //dt.Rows.Clear();
-        //    //dt.Columns.Clear();
-        //    //dt.Rows.a
-
-        //    //// Declare variables for DataColumn and DataRow objects.
-        //    //DataColumn column;
-        //    //DataRow row;
-
-        //    //dt.Rows[0][0] = @"Номер проверки";
-        //    //dt.Rows[0][1] = @"A";
-        //    //dt.Rows[0][2] = @"B";
-        //    //dt.Rows[0][3] = @"Максимальные допустимые значания";
-        //    //dt.Rows[0][5] = @"Измеренные значения";
-        //    //dt.Rows[0][6] = @"Комментарии";
-
-        //    //dt.Rows[1][3] = @"MIN";
-        //    //dt.Rows[1][4] = @"MAX";
-        //    //dt.Rows[1][6] = @"A";
-        //    //dt.Rows[1][7] = @"B";
-
-        //    //int k = 0;
-        //    //int z = 0;
-        //    //for (int i = 2; i < dt.Rows.Count; i++)
-        //    //{
-        //    //    for (int j = 0; j < dt.Columns.Count; j++)
-        //    //    {
-        //    //        //dt.Rows[i][0] = data[k].Index;
-        //    //        // dt.Rows[i][1] = data[k].
-        //    //    }
-        //    //}
-        //    //dt.Columns.Add("Номер проверки", typeof(string));
-        //    //dt.Columns.Add("A", typeof(string));
-        //    //dt.Columns.Add("B", typeof(string));
-        //    //dt.Columns.Add("Максимальные допустимые значения", typeof(string));
-        //    //dt.Columns.Add("Измеренные значения", typeof(string));
-        //    //dt.Columns.Add("Комментарий", typeof(string));
-        //    //dt.Rows.Add();
-
-
-        //    //using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
-        //    //{
-        //    //    IWorkbook wb = new XSSFWorkbook();
-        //    //    ISheet sheet = wb.CreateSheet("Sheet1");
-        //    //    ICreationHelper cH = wb.GetCreationHelper();
-        //    //    for (int i = 0; i < dt.Rows.Count; i++)
-        //    //    {
-        //    //        IRow row = sheet.CreateRow(i);
-        //    //        for (int j = 0; j < 3; j++)
-        //    //        {
-        //    //            ICell cell = row.CreateCell(j);
-        //    //            cell.SetCellValue(cH.CreateRichTextString(dt.Rows[i].ItemArray[j].ToString()));
-        //    //        }
-        //    //    }
-        //    //    wb.Write(stream);
-        //    //}
-
-        //    SaveTable(_myDataTable, path);
-
-        //    return false;
-        //}
-

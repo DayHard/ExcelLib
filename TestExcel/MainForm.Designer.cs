@@ -31,6 +31,7 @@
             this.btnClickMe = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.btnAutoClick = new System.Windows.Forms.Button();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.SuspendLayout();
             // 
             // btnClickMe
@@ -75,6 +76,7 @@
         private System.Windows.Forms.Button btnClickMe;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.Button btnAutoClick;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
     }
 }
 
