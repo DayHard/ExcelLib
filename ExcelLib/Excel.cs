@@ -749,9 +749,19 @@ namespace ExcelLib
                     if (list[0, i] != String.Empty && int.TryParse(list[0, i], out value))
                     {
                         BPPPTest[k].Index = value;
-                        BPPPTest[k].Max = Double.NegativeInfinity; //list[3, i]
-                        BPPPTest[k].Min = Double.NegativeInfinity; //list[4, i]
-                        BPPPTest[k].Value = Double.NegativeInfinity; //list[5, i]
+
+                        if (list[3, i] != String.Empty)
+                            BPPPTest[k].Max = Convert.ToDouble(list[3, i]); //list[3, i]
+                        else BPPPTest[k].Max = Double.NegativeInfinity;
+
+                        if (list[4, i] != String.Empty)
+                            BPPPTest[k].Min = Convert.ToDouble(list[4, i]); //list[4, i]
+                        else BPPPTest[k].Min = Double.NegativeInfinity;
+
+                        if (list[5, i] != String.Empty)
+                            BPPPTest[k].Value = Convert.ToDouble(list[5, i]); //list[5, i]
+                        else BPPPTest[k].Value = Double.NegativeInfinity;
+
                         BPPPTest[k].Comment = list[6, i] + " " + list[7, i];
                         BPPPTest[k].Range = Convert.ToInt32(list[8, i]);
 
