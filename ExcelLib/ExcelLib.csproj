@@ -70,7 +70,6 @@
     <Compile Include="EData4.cs" />
     <Compile Include="BPPPTest.cs" />
     <Compile Include="Excel.cs" />
-    <Compile Include="ExcelFileWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
