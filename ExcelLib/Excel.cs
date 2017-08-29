@@ -3,9 +3,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using MSExcel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelLib
@@ -861,6 +859,12 @@ namespace ExcelLib
             arr[1, 8] = "Ом";
             arr[0, 9] = "Результат";
 
+
+            bool[] successColor = new bool[data.Length + 3];
+            for (int i = 0; i < successColor.Length; i++)
+            {
+                successColor[i] = false;
+            }
             int k = 0;
             for (int i = 2; i < data.Length + 2; i++)
             {
@@ -889,21 +893,32 @@ namespace ExcelLib
                 arr[i, 7] = tcom[1];
                 arr[i, 8] = data[k].Range.ToString();
                 arr[i, 9] = data[k].Result;
-
+                if (data[k].Result == "PASSED")
+                    successColor[k] = true;
                 k++;
             }
             try
             {
                 MSExcel.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[data.Length + 2, 10]];
                 r.Value = arr;
+                xlWorkSheet.Columns.EntireColumn.AutoFit();
 
+                //Пример изменения цвета ячейки
+                //xlWorkSheet.Cells[1, 1].Interior.Color = MSExcel.XlRgbColor.rgbRed;
 
-                /*
-                xlWorkSheet.get_Range(FirstRange, LastRange).EntireColumn.AutoFit(); //для столбца
-                xlWorkSheet.get_Range(FirstRange, LastRange).EntireRow.AutoFit();//для строки
-                 */
-                //xlWorkSheet.get_Range("A1", xlWorkBook.Sheets[1].Cells.SpecialCells(MSExcel.XlCellType.xlCellTypeLastCell).Column).EntireColumn.AutoFit(); //для столбца
-                //xlWorkSheet.get_Range("A1", xlWorkBook.Sheets[1].Cells.SpecialCells(MSExcel.XlCellType.xlCellTypeLastCell).Row).EntireRow.AutoFit();//для строки
+                for (int i = 0; i < successColor.Length - 3; i++)
+                {
+                    if (successColor[i])
+                        xlWorkSheet.Cells[i + 3, 10].Font.Color = MSExcel.XlRgbColor.rgbGreen;
+                    else xlWorkSheet.Cells[i + 3, 10].Font.Color = MSExcel.XlRgbColor.rgbRed;
+                }
+                //var columnHeadingsRange = xlWorkSheet.Range[
+                //    xlWorkSheet.Cells[COLUMN_HEADING_ROW, FIRST_COL],
+                //    xlWorkSheet.Cells[COLUMN_HEADING_ROW, LAST_COL]];
+
+                //columnHeadingsRange.Interior.Color = MSExcel.XlRgbColor.rgbSkyBlue;
+
+                //columnHeadingsRange.Font.Color = MSExcel.XlRgbColor.rgbWhite;
 
                 xlWorkBook.SaveAs(path, MSExcel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue,
                 MSExcel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
