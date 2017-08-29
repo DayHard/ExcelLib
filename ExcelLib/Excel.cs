@@ -751,12 +751,12 @@ namespace ExcelLib
                         BPPPTest[k].Index = value;
 
                         if (list[3, i] != String.Empty)
-                            BPPPTest[k].Max = Convert.ToDouble(list[3, i]); //list[3, i]
-                        else BPPPTest[k].Max = Double.NegativeInfinity;
+                            BPPPTest[k].Min = Convert.ToDouble(list[3, i]); //list[3, i]
+                        else BPPPTest[k].Min = Double.NegativeInfinity;
 
                         if (list[4, i] != String.Empty)
-                            BPPPTest[k].Min = Convert.ToDouble(list[4, i]); //list[4, i]
-                        else BPPPTest[k].Min = Double.NegativeInfinity;
+                            BPPPTest[k].Max = Convert.ToDouble(list[4, i]); //list[4, i]
+                        else BPPPTest[k].Max = Double.NegativeInfinity;
 
                         if (list[5, i] != String.Empty)
                             BPPPTest[k].Value = Convert.ToDouble(list[5, i]); //list[5, i]
@@ -784,6 +784,7 @@ namespace ExcelLib
                             BPPPTest[k].Output[j].Device = "r" + outdata2[1];
                             BPPPTest[k].Output[j].Channel = Convert.ToInt32(outdata3[1]);
                         }
+                        BPPPTest[k].Result = list[9, i];
                         k++;
                     }
                 }
@@ -842,7 +843,8 @@ namespace ExcelLib
             xlWorkBook = exApp.Workbooks.Add(misValue);
             xlWorkSheet = (MSExcel.Worksheet)xlWorkBook.Worksheets.Item[1];
 
-            string[,] arr = new string[data.Length + 3, 9];
+            //При добавлении столбцов, изменить размер массива(ниже при  MSExcel.Range r  тоже!)
+            string[,] arr = new string[data.Length + 3, 10];
             arr[0, 0] = "Номер проверки";
             arr[0, 1] = "A";
             arr[0, 2] = "B";
@@ -857,6 +859,7 @@ namespace ExcelLib
             arr[1, 7] = "B";
             arr[0, 8] = "Диапазон";
             arr[1, 8] = "Ом";
+            arr[0, 9] = "Результат";
 
             int k = 0;
             for (int i = 2; i < data.Length + 2; i++)
@@ -875,18 +878,23 @@ namespace ExcelLib
                     arr[i, 2] += "k" + data[k].Output[j].Channel + data[k].Output[j].Device;
                 }
 
+                // ReSharper disable once SpecifyACultureInStringConversionExplicitly
                 arr[i, 3] = data[k].Min.ToString();
+                // ReSharper disable once SpecifyACultureInStringConversionExplicitly
                 arr[i, 4] = data[k].Max.ToString();
+                // ReSharper disable once SpecifyACultureInStringConversionExplicitly
                 arr[i, 5] = data[k].Value.ToString();
                 var tcom = data[k].Comment.Split(' ');
                 arr[i, 6] = tcom[0];
                 arr[i, 7] = tcom[1];
                 arr[i, 8] = data[k].Range.ToString();
+                arr[i, 9] = data[k].Result;
+
                 k++;
             }
             try
             {
-                MSExcel.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[data.Length + 2, 9]];
+                MSExcel.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[data.Length + 2, 10]];
                 r.Value = arr;
 
 

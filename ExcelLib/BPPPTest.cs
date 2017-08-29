@@ -28,6 +28,7 @@ namespace ExcelLib
         private double _max;
         private double _value;
         private string _comment;
+        private string _result;
         private int _range;
         public Contact[] Input;
         public Contact[] Output;
@@ -66,6 +67,12 @@ namespace ExcelLib
         {
             get { return _range; }
             set { _range = value; }
+        }
+
+        public string Result
+        {
+            get { return _result; }
+            set { _result = value; }
         }
     }
 }
