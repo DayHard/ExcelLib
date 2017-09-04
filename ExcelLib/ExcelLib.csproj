@@ -65,7 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EData1and2.cs" />
+    <Compile Include="DAQTest.cs" />
     <Compile Include="EData3.cs" />
     <Compile Include="EData4.cs" />
     <Compile Include="BPPPTest.cs" />

@@ -1,6 +1,4 @@
-﻿using Microsoft.Office.Interop.Excel;
-
-namespace ExcelLib
+﻿namespace ExcelLib
 {
     /// <summary>
     /// Один тест соотвествующий каждой строке таблицы Excel файла. Для BPPP.

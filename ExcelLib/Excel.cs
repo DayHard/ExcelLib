@@ -11,7 +11,7 @@ namespace ExcelLib
     public static class Excel
     {
 
-        public static EData1And2[] EData { get; set; }
+        public static DAQTest[] DAQTest { get; set; }
         public static EData3[] EData3 { get; set; }
         public static EData4[] EData4 { get; set; }
         public static BPPPTest[] BPPPTest { get; set; }
@@ -268,7 +268,7 @@ namespace ExcelLib
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static EData1And2[] ParseEx(string path)
+        public static DAQTest[] ParseDAQ(string path)
         {
             try
             {
@@ -300,10 +300,10 @@ namespace ExcelLib
                 }
 
 
-                EData = new EData1And2[lenght];
-                for (int i = 0; i < EData.Length; i++)
+                DAQTest = new DAQTest[lenght];
+                for (int i = 0; i < DAQTest.Length; i++)
                 {
-                    EData[i] = new EData1And2();
+                    DAQTest[i] = new DAQTest();
                 }
 
                 var k = 0;
@@ -315,7 +315,7 @@ namespace ExcelLib
                         int value;
                         if (int.TryParse(list[0, j], out value))
                         {
-                            EData[k].Index = value;
+                            DAQTest[k].Index = value;
 
                             for (int i = 1; i < table.Columns.Count; i++)
                             {
@@ -327,9 +327,9 @@ namespace ExcelLib
                                         string[] chandev = list[i, j].Split('/');
                                         string[] chandev2 = chandev[1].Split('r');
                                         string[] chandev3 = chandev2[0].Split('k');
-                                        EData[k].Input.Channel = int.Parse(chandev3[1]);
-                                        EData[k].Input.Device = "r" + chandev2[1];
-                                        EData[k].Comment = tabHeader[i] + " " + chandev[0] + ", ";
+                                        DAQTest[k].Input.Channel = int.Parse(chandev3[1]);
+                                        DAQTest[k].Input.Device = "r" + chandev2[1];
+                                        DAQTest[k].Comment = tabHeader[i] + " " + chandev[0] + ", ";
                                     }
                                     else
                                     {
@@ -337,11 +337,11 @@ namespace ExcelLib
                                         string[] chandev = list[i, j].Split('/');
                                         string[] chandev2 = chandev[1].Split('r');
                                         string[] chandev3 = chandev2[0].Split('k');
-                                        EData[k].Output.Channel = int.Parse(chandev3[1]);
-                                        EData[k].Output.Device = "r" + chandev2[1];
+                                        DAQTest[k].Output.Channel = int.Parse(chandev3[1]);
+                                        DAQTest[k].Output.Device = "r" + chandev2[1];
 
                                         string[] chaldev = list[i, j].Split('/');
-                                        EData[k].Comment += tabHeader[i] + " " + chaldev[0];
+                                        DAQTest[k].Comment += tabHeader[i] + " " + chaldev[0];
                                         break;
                                     }
                                 }
@@ -360,7 +360,7 @@ namespace ExcelLib
                         }
                     }
                 }
-                return EData;
+                return DAQTest;
             }
             catch (Exception ex)
             {

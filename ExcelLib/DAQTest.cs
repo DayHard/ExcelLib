@@ -2,14 +2,14 @@
 
 namespace ExcelLib
 {
-    public class EData1And2
+    public class DAQTest
     {
         private int _index;
         private string _comment;
         public Contact Input;
         public Contact Output;
 
-        public EData1And2()
+        public DAQTest()
         {
             _index = 0;
             _comment = String.Empty;
