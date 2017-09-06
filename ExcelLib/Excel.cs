@@ -24,241 +24,248 @@ namespace ExcelLib
         private static DataTable ParseTable(string path)
         {
             DataTable table;
-            if (File.Exists(path))
+            try
             {
-
-                IWorkbook workbook; //IWorkbook determina si es xls o xlsx              
-                ISheet worksheet;
-                string first_sheet_name;
-
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                if (File.Exists(path))
                 {
-                    workbook = WorkbookFactory.Create(fs); //Abre tanto XLS como XLSX
-                    worksheet = workbook.GetSheetAt(0); //Obtener Hoja por indice
-                    first_sheet_name = worksheet.SheetName; //Obtener el nombre de la Hoja
 
-                    table = new DataTable(first_sheet_name);
-                    table.Rows.Clear();
-                    table.Columns.Clear();
+                    IWorkbook workbook; //IWorkbook determina si es xls o xlsx              
+                    ISheet worksheet;
+                    string first_sheet_name;
 
-                    // Leer Fila por fila desde la primera
-                    for (int rowIndex = 0; rowIndex <= worksheet.LastRowNum; rowIndex++)
+                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                     {
-                        DataRow newReg = null;
-                        IRow row = worksheet.GetRow(rowIndex);
-                        IRow row2 = null;
-                        IRow row3 = null;
+                        workbook = WorkbookFactory.Create(fs); //Abre tanto XLS como XLSX
+                        worksheet = workbook.GetSheetAt(0); //Obtener Hoja por indice
+                        first_sheet_name = worksheet.SheetName; //Obtener el nombre de la Hoja
 
-                        if (rowIndex == 0)
+                        table = new DataTable(first_sheet_name);
+                        table.Rows.Clear();
+                        table.Columns.Clear();
+
+                        // Leer Fila por fila desde la primera
+                        for (int rowIndex = 0; rowIndex <= worksheet.LastRowNum; rowIndex++)
                         {
-                            row2 =
-                                worksheet.GetRow(
-                                    rowIndex +
-                                    1); //Si es la Primera fila, obtengo tambien la segunda para saber el tipo de datos
-                            row3 = worksheet.GetRow(rowIndex + 2); //Y la tercera tambien por las dudas
-                        }
+                            DataRow newReg = null;
+                            IRow row = worksheet.GetRow(rowIndex);
+                            IRow row2 = null;
+                            IRow row3 = null;
 
-                        if (row != null) //null is when the row only contains empty cells 
-                        {
-                            if (rowIndex > 0) newReg = table.NewRow();
-
-                            int colIndex = 0;
-                            //Leer cada Columna de la fila
-                            foreach (ICell cell in row.Cells)
+                            if (rowIndex == 0)
                             {
-                                object valorCell = null;
-                                string cellType = "";
-                                string[] cellType2 = new string[2];
+                                row2 =
+                                    worksheet.GetRow(
+                                        rowIndex +
+                                        1); //Si es la Primera fila, obtengo tambien la segunda para saber el tipo de datos
+                                row3 = worksheet.GetRow(rowIndex + 2); //Y la tercera tambien por las dudas
+                            }
 
-                                if (rowIndex == 0) //Asumo que la primera fila contiene los titlos:
+                            if (row != null) //null is when the row only contains empty cells 
+                            {
+                                if (rowIndex > 0) newReg = table.NewRow();
+
+                                int colIndex = 0;
+                                //Leer cada Columna de la fila
+                                foreach (ICell cell in row.Cells)
                                 {
-                                    for (int i = 0; i < 2; i++)
-                                    {
-                                        ICell cell2;
-                                        if (i == 0)
-                                        {
-                                            cell2 = row2.GetCell(cell.ColumnIndex);
-                                        }
-                                        else
-                                        {
-                                            cell2 = row3.GetCell(cell.ColumnIndex);
-                                        }
+                                    object valorCell = null;
+                                    string cellType = "";
+                                    string[] cellType2 = new string[2];
 
-                                        if (cell2 != null)
+                                    if (rowIndex == 0) //Asumo que la primera fila contiene los titlos:
+                                    {
+                                        for (int i = 0; i < 2; i++)
                                         {
-                                            switch (cell2.CellType)
+                                            ICell cell2;
+                                            if (i == 0)
                                             {
-                                                case CellType.Blank: break;
-                                                case CellType.Boolean:
-                                                    cellType2[i] = "System.Boolean";
-                                                    break;
-                                                case CellType.String:
-                                                    cellType2[i] = "System.String";
-                                                    break;
-                                                case CellType.Numeric:
-                                                    if (DateUtil.IsCellDateFormatted(cell2))
-                                                    {
-                                                        cellType2[i] = "System.DateTime";
-                                                    }
-                                                    else
-                                                    {
-                                                        cellType2[i] =
-                                                            "System.Double"; //valorCell = cell2.NumericCellValue;
-                                                    }
-                                                    break;
-
-                                                case CellType.Formula:
-                                                    bool continuar = true;
-                                                    switch (cell2.CachedFormulaResultType)
-                                                    {
-                                                        case CellType.Boolean:
-                                                            cellType2[i] = "System.Boolean";
-                                                            break;
-                                                        case CellType.String:
-                                                            cellType2[i] = "System.String";
-                                                            break;
-                                                        case CellType.Numeric:
-                                                            if (DateUtil.IsCellDateFormatted(cell2))
-                                                            {
-                                                                cellType2[i] = "System.DateTime";
-                                                            }
-                                                            else
-                                                            {
-                                                                try
-                                                                {
-                                                                    //DETERMINAR SI ES BOOLEANO
-                                                                    if (cell2.CellFormula == "TRUE()")
-                                                                    {
-                                                                        cellType2[i] = "System.Boolean";
-                                                                        continuar = false;
-                                                                    }
-                                                                    if (continuar && cell2.CellFormula == "FALSE()")
-                                                                    {
-                                                                        cellType2[i] = "System.Boolean";
-                                                                        continuar = false;
-                                                                    }
-                                                                    if (continuar)
-                                                                    {
-                                                                        cellType2[i] = "System.Double";
-                                                                    }
-                                                                }
-                                                                catch
-                                                                {
-                                                                    // ignored
-                                                                }
-                                                            }
-                                                            break;
-                                                    }
-                                                    break;
-                                                default:
-                                                    cellType2[i] = "System.String";
-                                                    break;
-                                            }
-                                        }
-                                    }
-
-                                    //Resolver las diferencias de Tipos
-                                    if (cellType2[0] == cellType2[1])
-                                    {
-                                    }
-                                    else
-                                    {
-                                        if (cellType2[0] == null) cellType = cellType2[1];
-                                        if (cellType2[1] == null) cellType = cellType2[0];
-                                        if (cellType == "")
-                                        {
-                                        }
-                                    }
-
-                                    //Obtener el nombre de la Columna
-                                    string colName = "Column_{0}";
-                                    try
-                                    {
-                                        colName = cell.StringCellValue;
-                                    }
-                                    catch
-                                    {
-                                        colName = string.Format(colName, colIndex);
-                                    }
-
-                                    //Verificar que NO se repita el Nombre de la Columna
-                                    foreach (DataColumn col in table.Columns)
-                                    {
-                                        if (col.ColumnName == colName)
-                                            colName = string.Format("{0}_{1}", colName, colIndex);
-                                    }
-
-                                    //Agregar el campos de la tabla:
-                                    DataColumn codigo = new DataColumn(); //colName, System.Type.GetType(cellType));
-                                    table.Columns.Add(codigo);
-                                    colIndex++;
-                                }
-                                else
-                                {
-                                    //Las demas filas son registros:
-                                    switch (cell.CellType)
-                                    {
-                                        case CellType.Blank:
-                                            valorCell = DBNull.Value;
-                                            break;
-                                        case CellType.Boolean:
-                                            valorCell = cell.BooleanCellValue;
-                                            break;
-                                        case CellType.String:
-                                            valorCell = cell.StringCellValue;
-                                            break;
-                                        case CellType.Numeric:
-                                            if (DateUtil.IsCellDateFormatted(cell))
-                                            {
-                                                valorCell = cell.DateCellValue;
+                                                cell2 = row2.GetCell(cell.ColumnIndex);
                                             }
                                             else
                                             {
-                                                valorCell = cell.NumericCellValue;
+                                                cell2 = row3.GetCell(cell.ColumnIndex);
                                             }
-                                            break;
-                                        case CellType.Formula:
-                                            switch (cell.CachedFormulaResultType)
+
+                                            if (cell2 != null)
                                             {
-                                                case CellType.Blank:
-                                                    valorCell = DBNull.Value;
-                                                    break;
-                                                case CellType.String:
-                                                    valorCell = cell.StringCellValue;
-                                                    break;
-                                                case CellType.Boolean:
-                                                    valorCell = cell.BooleanCellValue;
-                                                    break;
-                                                case CellType.Numeric:
-                                                    if (DateUtil.IsCellDateFormatted(cell))
-                                                    {
-                                                        valorCell = cell.DateCellValue;
-                                                    }
-                                                    else
-                                                    {
-                                                        valorCell = cell.NumericCellValue;
-                                                    }
-                                                    break;
+                                                switch (cell2.CellType)
+                                                {
+                                                    case CellType.Blank: break;
+                                                    case CellType.Boolean:
+                                                        cellType2[i] = "System.Boolean";
+                                                        break;
+                                                    case CellType.String:
+                                                        cellType2[i] = "System.String";
+                                                        break;
+                                                    case CellType.Numeric:
+                                                        if (DateUtil.IsCellDateFormatted(cell2))
+                                                        {
+                                                            cellType2[i] = "System.DateTime";
+                                                        }
+                                                        else
+                                                        {
+                                                            cellType2[i] =
+                                                                "System.Double"; //valorCell = cell2.NumericCellValue;
+                                                        }
+                                                        break;
+
+                                                    case CellType.Formula:
+                                                        bool continuar = true;
+                                                        switch (cell2.CachedFormulaResultType)
+                                                        {
+                                                            case CellType.Boolean:
+                                                                cellType2[i] = "System.Boolean";
+                                                                break;
+                                                            case CellType.String:
+                                                                cellType2[i] = "System.String";
+                                                                break;
+                                                            case CellType.Numeric:
+                                                                if (DateUtil.IsCellDateFormatted(cell2))
+                                                                {
+                                                                    cellType2[i] = "System.DateTime";
+                                                                }
+                                                                else
+                                                                {
+                                                                    try
+                                                                    {
+                                                                        //DETERMINAR SI ES BOOLEANO
+                                                                        if (cell2.CellFormula == "TRUE()")
+                                                                        {
+                                                                            cellType2[i] = "System.Boolean";
+                                                                            continuar = false;
+                                                                        }
+                                                                        if (continuar && cell2.CellFormula == "FALSE()")
+                                                                        {
+                                                                            cellType2[i] = "System.Boolean";
+                                                                            continuar = false;
+                                                                        }
+                                                                        if (continuar)
+                                                                        {
+                                                                            cellType2[i] = "System.Double";
+                                                                        }
+                                                                    }
+                                                                    catch
+                                                                    {
+                                                                        // ignored
+                                                                    }
+                                                                }
+                                                                break;
+                                                        }
+                                                        break;
+                                                    default:
+                                                        cellType2[i] = "System.String";
+                                                        break;
+                                                }
                                             }
-                                            break;
-                                        default:
-                                            valorCell = cell.StringCellValue;
-                                            break;
+                                        }
+
+                                        //Resolver las diferencias de Tipos
+                                        if (cellType2[0] == cellType2[1])
+                                        {
+                                        }
+                                        else
+                                        {
+                                            if (cellType2[0] == null) cellType = cellType2[1];
+                                            if (cellType2[1] == null) cellType = cellType2[0];
+                                            if (cellType == "")
+                                            {
+                                            }
+                                        }
+
+                                        //Obtener el nombre de la Columna
+                                        string colName = "Column_{0}";
+                                        try
+                                        {
+                                            colName = cell.StringCellValue;
+                                        }
+                                        catch
+                                        {
+                                            colName = string.Format(colName, colIndex);
+                                        }
+
+                                        //Verificar que NO se repita el Nombre de la Columna
+                                        foreach (DataColumn col in table.Columns)
+                                        {
+                                            if (col.ColumnName == colName)
+                                                colName = string.Format("{0}_{1}", colName, colIndex);
+                                        }
+
+                                        //Agregar el campos de la tabla:
+                                        DataColumn codigo = new DataColumn(); //colName, System.Type.GetType(cellType));
+                                        table.Columns.Add(codigo);
+                                        colIndex++;
                                     }
-                                    //Agregar el nuevo Registro
-                                    if (cell.ColumnIndex <= table.Columns.Count - 1)
-                                        newReg[cell.ColumnIndex] = valorCell;
+                                    else
+                                    {
+                                        //Las demas filas son registros:
+                                        switch (cell.CellType)
+                                        {
+                                            case CellType.Blank:
+                                                valorCell = DBNull.Value;
+                                                break;
+                                            case CellType.Boolean:
+                                                valorCell = cell.BooleanCellValue;
+                                                break;
+                                            case CellType.String:
+                                                valorCell = cell.StringCellValue;
+                                                break;
+                                            case CellType.Numeric:
+                                                if (DateUtil.IsCellDateFormatted(cell))
+                                                {
+                                                    valorCell = cell.DateCellValue;
+                                                }
+                                                else
+                                                {
+                                                    valorCell = cell.NumericCellValue;
+                                                }
+                                                break;
+                                            case CellType.Formula:
+                                                switch (cell.CachedFormulaResultType)
+                                                {
+                                                    case CellType.Blank:
+                                                        valorCell = DBNull.Value;
+                                                        break;
+                                                    case CellType.String:
+                                                        valorCell = cell.StringCellValue;
+                                                        break;
+                                                    case CellType.Boolean:
+                                                        valorCell = cell.BooleanCellValue;
+                                                        break;
+                                                    case CellType.Numeric:
+                                                        if (DateUtil.IsCellDateFormatted(cell))
+                                                        {
+                                                            valorCell = cell.DateCellValue;
+                                                        }
+                                                        else
+                                                        {
+                                                            valorCell = cell.NumericCellValue;
+                                                        }
+                                                        break;
+                                                }
+                                                break;
+                                            default:
+                                                valorCell = cell.StringCellValue;
+                                                break;
+                                        }
+                                        //Agregar el nuevo Registro
+                                        if (cell.ColumnIndex <= table.Columns.Count - 1)
+                                            newReg[cell.ColumnIndex] = valorCell;
+                                    }
                                 }
                             }
+                            if (rowIndex > 0) table.Rows.Add(newReg);
                         }
-                        if (rowIndex > 0) table.Rows.Add(newReg);
+                        table.AcceptChanges();
                     }
-                    table.AcceptChanges();
+                }
+                else
+                {
+                    throw new Exception("ERROR 404: El archivo especificado NO existe.");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("ERROR 404: El archivo especificado NO existe.");
+                return null;
             }
             return table;
         }
@@ -273,6 +280,8 @@ namespace ExcelLib
             try
             {
                 var table = ParseTable(path);
+
+                if (table == null) return null;
 
                 string[,] list = new string[table.Columns.Count, table.Rows.Count];
 
@@ -671,7 +680,7 @@ namespace ExcelLib
         /// Используется для блока проверки печатных плат, возвращает тесты ввиде массива (BPPP)
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns>Возвращает BPPPTest[]</returns>
         public static BPPPTest[] ParseBPPP(string path)
         {
             try
@@ -799,12 +808,36 @@ namespace ExcelLib
         /// </summary>
         /// <param name="data"></param>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns>Возращает статус сохранения</returns>
         public static string SaveBPPP(BPPPTest[] data, string path)
         {
             try
             {
                 string status = Wrapper.SaveBPPPWrapper(data, path);
+                return status;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+        }
+
+        /// <summary>
+        /// Используется для блока проверки печатных плат, сохраняет тесты в виде таблицы xls (DAQ)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="path"></param>
+        /// <returns>Возращает статус сохранения</returns>
+        public static string SaveDAQ(DAQTest[] data, string path)
+        {
+            try
+            {
+                string status = Wrapper.SaveDAQWrapper(data, path);
                 return status;
             }
             catch (Exception ex)
@@ -922,6 +955,292 @@ namespace ExcelLib
 
                 xlWorkBook.SaveAs(path, MSExcel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue,
                 MSExcel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                switch (ex.Message)
+                {
+                    default:
+                        return "Unknown error: " + ex.Message;
+                }
+            }
+            finally
+            {
+                xlWorkBook.Close(true, misValue, misValue);
+                exApp.Quit();
+
+                Marshal.ReleaseComObject(xlWorkSheet);
+                Marshal.ReleaseComObject(xlWorkBook);
+                Marshal.ReleaseComObject(exApp);
+            }
+        }
+
+        public static string SaveDAQWrapper(DAQTest[] data, string path)
+        {
+            MSExcel.Application exApp = new MSExcel.Application();
+
+            exApp.Visible = false;
+            exApp.ScreenUpdating = false;
+            // Отключае запрос на перезапись файла (разрешает перезапись)
+            exApp.DisplayAlerts = false;
+
+            MSExcel.Workbook xlWorkBook;
+            MSExcel.Worksheet xlWorkSheet;
+            object misValue = System.Reflection.Missing.Value;
+
+            xlWorkBook = exApp.Workbooks.Add(misValue);
+            xlWorkSheet = (MSExcel.Worksheet)xlWorkBook.Worksheets.Item[1];
+
+            //При добавлении столбцов, изменить размер массива(ниже при  MSExcel.Range r  тоже!)
+            string[,] arr = new string[data.Length + 3 + 16, 13];
+            arr[0, 0] = "ТЕСТЫ ЦЕПЕЙ";
+            arr[1, 0] = " ";
+            arr[2, 1] = "входы";
+            arr[2, 12] = "Результат";
+            //Шапка 1
+            arr[3, 0] = "№";
+            arr[3, 1] = "XP1";
+            arr[3, 2] = "XS1";
+            arr[3, 3] = "XS2";
+            arr[3, 4] = "XS3";
+            arr[3, 5] = "XS4";
+            arr[3, 6] = "XS5";
+            arr[3, 7] = "XS6";
+            arr[3, 8] = "XS7";
+            arr[3, 9] = "XS8";
+            arr[3, 10] = "XS9";
+            arr[3, 11] = "XS10";
+            //Шапка 2
+            arr[72, 0] = "№";
+            arr[72, 1] = "XP2";
+            arr[72, 2] = "XS1";
+            arr[72, 3] = "XS2";
+            arr[72, 4] = "XS3";
+            arr[72, 5] = "XS4";
+            arr[72, 6] = "XS5";
+            arr[72, 7] = "XS6";
+            arr[72, 8] = "XS7";
+            arr[72, 9] = "XS8";
+            arr[72, 10] = "XS9";
+            arr[72, 11] = "XS10";
+            //Шапка 3
+            arr[91, 0] = "№";
+            arr[91, 1] = "XP3";
+            arr[91, 2] = "XS1";
+            arr[91, 3] = "XS2";
+            arr[91, 4] = "XS3";
+            arr[91, 5] = "XS4";
+            arr[91, 6] = "XS5";
+            arr[91, 7] = "XS6";
+            arr[91, 8] = "XS7";
+            arr[91, 9] = "XS8";
+            arr[91, 10] = "XS9";
+            arr[91, 11] = "XS10";
+            //Шапка 4
+            arr[172, 0] = "№";
+            arr[172, 1] = "XP4";
+            arr[172, 2] = "XS1";
+            arr[172, 3] = "XS2";
+            arr[172, 4] = "XS3";
+            arr[172, 5] = "XS4";
+            arr[172, 6] = "XS5";
+            arr[172, 7] = "XS6";
+            arr[172, 8] = "XS7";
+            arr[172, 9] = "XS8";
+            arr[172, 10] = "XS9";
+            arr[172, 11] = "XS10";
+            //Шапка 5
+            arr[231, 0] = "№";
+            arr[231, 1] = "XP4";
+            arr[231, 2] = "XS1";
+            arr[231, 3] = "XS2";
+            arr[231, 4] = "XS3";
+            arr[231, 5] = "XS4";
+            arr[231, 6] = "XS5";
+            arr[231, 7] = "XS6";
+            arr[231, 8] = "XS7";
+            arr[231, 9] = "XS8";
+            arr[231, 10] = "XS9";
+            arr[231, 11] = "XS10";
+            //Шапка 6
+            arr[248, 0] = "№";
+            arr[248, 1] = "XS2";
+            arr[248, 2] = "XS1";
+            arr[248, 3] = "XS2";
+            arr[248, 4] = "XS3";
+            arr[248, 5] = "XS4";
+            arr[248, 6] = "XS5";
+            arr[248, 7] = "XS6";
+            arr[248, 8] = "XS7";
+            arr[248, 9] = "XS8";
+            arr[248, 10] = "XS9";
+            arr[248, 11] = "XS10";
+            //Шапка 7
+            arr[303, 0] = "№";
+            arr[303, 1] = "XS3";
+            arr[303, 2] = "XS1";
+            arr[303, 3] = "XS2";
+            arr[303, 4] = "XS3";
+            arr[303, 5] = "XS4";
+            arr[303, 6] = "XS5";
+            arr[303, 7] = "XS6";
+            arr[303, 8] = "XS7";
+            arr[303, 9] = "XS8";
+            arr[303, 10] = "XS9";
+            arr[303, 11] = "XS10";
+            //Шапка 8
+            arr[308, 0] = "№";
+            arr[308, 1] = "XS4";
+            arr[308, 2] = "XS1";
+            arr[308, 3] = "XS2";
+            arr[308, 4] = "XS3";
+            arr[308, 5] = "XS4";
+            arr[308, 6] = "XS5";
+            arr[308, 7] = "XS6";
+            arr[308, 8] = "XS7";
+            arr[308, 9] = "XS8";
+            arr[308, 10] = "XS9";
+            arr[308, 11] = "XS10";
+            //Шапка 9
+            arr[317, 0] = "№";
+            arr[317, 1] = "XS6";
+            arr[317, 2] = "XS1";
+            arr[317, 3] = "XS2";
+            arr[317, 4] = "XS3";
+            arr[317, 5] = "XS4";
+            arr[317, 6] = "XS5";
+            arr[317, 7] = "XS6";
+            arr[317, 8] = "XS7";
+            arr[317, 9] = "XS8";
+            arr[317, 10] = "XS9";
+            arr[317, 11] = "XS10";
+            //Шапка 10
+            arr[321, 0] = "№";
+            arr[321, 1] = "XS1";
+            //arr[321, 2] = "XS1";
+            //arr[321, 3] = "XS2";
+            arr[321, 4] = "XS3";
+            //Шапка 11
+            arr[323, 0] = "№";
+            arr[323, 1] = "XS10";
+            arr[323, 2] = "XS1";
+            arr[323, 6] = "XS5";
+            arr[323, 11] = "XS10";
+            //Шапка 12
+            arr[328, 0] = "№";
+            arr[328, 1] = "XS3";
+            arr[328, 2] = "XP3";
+            //Шапка 13
+            arr[330, 0] = "№";
+            arr[330, 1] = "XP1";
+            arr[330, 2] = "XS10";
+            //Шапка 14
+            arr[332, 0] = "№";
+            arr[332, 1] = "XS4";
+            arr[332, 2] = "XS5";
+            //Шапка 15
+            arr[334, 0] = "№";
+            arr[334, 1] = "XP1";
+            arr[334, 2] = "XS10";
+            //Шапка 16
+            arr[337, 0] = "№";
+            arr[337, 1] = "XS1";
+            arr[337, 2] = "XS3";
+
+            try
+            {
+                int k = 0;
+                int headRow = 0;
+                int posColunm = 0;
+                for (int i = 3; i < data.Length + 3 + 16; i++)
+                {
+                    if (arr[i, 0] != "№")
+                    {
+                        arr[i, 0] = data[k].Index.ToString();
+                        var com = data[k].Comment.Split(',');
+                        var com1 = com[0].Split(' ');
+                        var com2 = com[1].Split(' ');
+                        arr[i, 1] = com1[1].ToUpper() + "/K" + data[k].Input.Channel + " " + data[k].Input.Device.ToUpper();
+
+                        for (int j = 2; j < 12; j++)
+                        {
+                            if (com2[1] == arr[headRow, j])
+                            {
+                                posColunm = j;
+                                break;
+                            }
+                        }
+
+                        arr[i, posColunm] = com2[2].ToUpper() + "/K" + data[k].Output.Channel + data[k].Output.Device.ToUpper();
+                        arr[i, 12] = data[k].Result;
+                        k++;
+                    }
+                    else
+                    {
+                        headRow = i;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+
+
+            //bool[] successColor = new bool[data.Length + 3];
+            //for (int i = 0; i < successColor.Length; i++)
+            //{
+            //    successColor[i] = false;
+            //}
+            //int k = 0;
+            //for (int i = 2; i < data.Length + 2; i++)
+            //{
+            //    arr[i, 0] = data[k].Index.ToString();
+
+            //    for (int j = 0; j < data[k].Input.Length; j++)
+            //    {
+            //        if (j > 0) arr[i, 1] += "/";
+            //        arr[i, 1] += "k" + data[k].Input[j].Channel + data[k].Input[j].Device;
+            //    }
+
+            //    for (int j = 0; j < data[k].Output.Length; j++)
+            //    {
+            //        if (j > 0) arr[i, 2] += "/";
+            //        arr[i, 2] += "k" + data[k].Output[j].Channel + data[k].Output[j].Device;
+            //    }
+
+            //    // ReSharper disable once SpecifyACultureInStringConversionExplicitly
+            //    arr[i, 3] = data[k].Min.ToString();
+            //    // ReSharper disable once SpecifyACultureInStringConversionExplicitly
+            //    arr[i, 4] = data[k].Max.ToString();
+            //    // ReSharper disable once SpecifyACultureInStringConversionExplicitly
+            //    arr[i, 5] = data[k].Value.ToString();
+            //    var tcom = data[k].Comment.Split(' ');
+            //    arr[i, 6] = tcom[0];
+            //    arr[i, 7] = tcom[1];
+            //    arr[i, 8] = data[k].Range.ToString();
+            //    arr[i, 9] = data[k].Result;
+            //    if (data[k].Result == "PASSED")
+            //        successColor[k] = true;
+            //    k++;
+            try
+            {
+                MSExcel.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[data.Length + 3 + 16, 13]];
+                r.Value = arr;
+                xlWorkSheet.Columns.EntireColumn.AutoFit();
+
+                //for (int i = 0; i < successColor.Length - 3; i++)
+                //{
+                //    if (successColor[i])
+                //        xlWorkSheet.Cells[i + 3, 10].Font.Color = MSExcel.XlRgbColor.rgbGreen;
+                //    else xlWorkSheet.Cells[i + 3, 10].Font.Color = MSExcel.XlRgbColor.rgbRed;
+                //}
+
+                xlWorkBook.SaveAs(path, MSExcel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue,
+                    MSExcel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
 
                 return "Success";
             }

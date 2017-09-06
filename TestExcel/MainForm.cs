@@ -23,14 +23,24 @@ namespace TestExcel
 
         private void btnClickMe_Click(object sender, EventArgs e)
         {
-            BPPPTest[] BPPPTest = null;
+            //BPPPTest[] BPPPTest = null;
+            //if (openFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //     BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);     
+            //}
+            //if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //    var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
+            //}
+
+            DAQTest[] DAQTest= null;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                 BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);     
+                DAQTest = Excel.ParseDAQ(openFileDialog.FileName);
             }
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
+                var status = Excel.SaveDAQ(DAQTest, saveFileDialog.FileName);
             }
         }
 

@@ -8,6 +8,7 @@ namespace ExcelLib
         private string _comment;
         public Contact Input;
         public Contact Output;
+        private string _result;
 
         public DAQTest()
         {
@@ -25,6 +26,12 @@ namespace ExcelLib
         {
             get { return _comment; }
             set { _comment = value; }
+        }
+
+        public string Result
+        {
+            get { return _result; }
+            set { _result = value; }
         }
     }
 
