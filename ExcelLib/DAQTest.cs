@@ -9,6 +9,7 @@ namespace ExcelLib
         public Contact Input;
         public Contact Output;
         private string _result;
+        private string _value;
 
         public DAQTest()
         {
@@ -32,6 +33,12 @@ namespace ExcelLib
         {
             get { return _result; }
             set { _result = value; }
+        }
+
+        public string Value
+        {
+            get { return _value; }
+            set { _value = value; }
         }
     }
 
@@ -57,28 +64,4 @@ namespace ExcelLib
             set { _device = value; }
         }
     }
-
-    //public class Out
-    //{
-    //    private int _channel;
-    //    private string _device;
-
-    //    public Out()
-    //    {
-    //        Channel = 0;
-    //        Device = String.Empty;
-    //    }
-
-    //    public int Channel
-    //    {
-    //        get { return _channel; }
-    //        set { _channel = value; }
-    //    }
-
-    //    public string Device
-    //    {
-    //        get { return _device; }
-    //        set { _device = value; }
-    //    }
-    //}
 }
