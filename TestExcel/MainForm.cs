@@ -36,11 +36,11 @@ namespace TestExcel
             DAQTest[] DAQTest= null;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                DAQTest = Excel.ParseDaq(openFileDialog.FileName);
+                DAQTest = Excel.ParseDAQ(openFileDialog.FileName);
             }
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var status = Excel.SaveDaqErrors(DAQTest, saveFileDialog.FileName);
+                var status = Excel.SaveDAQ(DAQTest, saveFileDialog.FileName);
             }
         }
 

@@ -275,7 +275,7 @@ namespace ExcelLib
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static DAQTest[] ParseDaq_Old(string path)
+        public static DAQTest[] ParseDAQ_Old(string path)
         {
             try
             {
@@ -384,7 +384,7 @@ namespace ExcelLib
         /// </summary>
         /// <param name="path"></param>
         /// <returns>Возвращает массив объектов</returns>
-        public static DAQTest[] ParseDaq(string path)
+        public static DAQTest[] ParseDAQ(string path)
         {
             try
             {
@@ -738,7 +738,7 @@ namespace ExcelLib
         /// </summary>
         /// <param name="path"></param>
         /// <returns>Возвращает BPPPTest[]</returns>
-        public static BPPPTest[] ParseBppp(string path)
+        public static BPPPTest[] ParseBPPP(string path)
         {
             try
             {
@@ -866,7 +866,7 @@ namespace ExcelLib
         /// <param name="data"></param>
         /// <param name="path"></param>
         /// <returns>Возращает статус сохранения</returns>
-        public static string SaveBppp(BPPPTest[] data, string path)
+        public static string SaveBPPP(BPPPTest[] data, string path)
         {
             try
             {
@@ -890,7 +890,7 @@ namespace ExcelLib
         /// <param name="data"></param>
         /// <param name="path"></param>
         /// <returns>Возращает статус сохранения</returns>
-        public static string SaveDaq(DAQTest[] data, string path)
+        public static string SaveDAQ_Old(DAQTest[] data, string path)
         {
             try
             {
@@ -913,11 +913,11 @@ namespace ExcelLib
         /// <param name="data"></param>
         /// <param name="path"></param>
         /// <returns>Возвращает статус сохранения</returns>
-        public static string SaveDaqErrors(DAQTest[] data, string path)
+        public static string SaveDAQ(DAQTest[] data, string path)
         {
             try
             {
-                string status = Wrapper.SaveDaqErrorsWrapper(data, path);
+                string status = Wrapper.SaveDaqWrapper(data, path);
                 return status;
             }
             catch (Exception ex)
@@ -1333,7 +1333,7 @@ namespace ExcelLib
             }
         }
 
-        public static string SaveDaqErrorsWrapper(DAQTest[] data, string path)
+        public static string SaveDaqWrapper(DAQTest[] data, string path)
         {
             MSExcel.Application exApp = new MSExcel.Application();
 
@@ -1362,6 +1362,7 @@ namespace ExcelLib
             arr[1, 4] = "Канал";
             arr[1, 5] = "Комментарий";
             arr[1, 6] = "Значение";
+            arr[0, 7] = " ";
             arr[1, 7] = "Результат";
 
             int k = 0;
