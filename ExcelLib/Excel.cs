@@ -12,7 +12,7 @@ namespace ExcelLib
     {
 
         public static DAQTest[] DAQTest { get; set; }
-        public static EData3[] EData3 { get; set; }
+        public static IndTest[] IndTest { get; set; }
         public static EData4[] EData4 { get; set; }
         public static BPPPTest[] BPPPTest { get; set; }
 
@@ -32,8 +32,8 @@ namespace ExcelLib
                     IWorkbook workbook; //IWorkbook determina si es xls o xlsx              
                     ISheet worksheet;
                     string first_sheet_name;
-
-                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                    
+                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
                         workbook = WorkbookFactory.Create(fs); //Abre tanto XLS como XLSX
                         worksheet = workbook.GetSheetAt(0); //Obtener Hoja por indice
@@ -271,9 +271,9 @@ namespace ExcelLib
         }
 
         /// <summary>
-        /// Парсит таблицу типа 1 и 2, возвращает список тестов в указанном формате
+        /// Парсит таблицу типа 1 и 2, возвращает список тестов в указанном формате. Устаревший метод - работает лишь для кривонаписанных Виталиком файлов Excel
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Путь файла</param>
         /// <returns></returns>
         public static DAQTest[] ParseDAQ_Old(string path)
         {
@@ -416,9 +416,9 @@ namespace ExcelLib
                 for (int i = 1; i < table.Rows.Count; i++)
                 {
                     DAQTest[k].Index = Convert.ToInt32(list[0, i]);
-                    DAQTest[k].Input.Device = list[1, i];
+                    DAQTest[k].Input.Device = list[1, i].ToUpper();
                     DAQTest[k].Input.Channel = Convert.ToInt32(list[2, i]);
-                    DAQTest[k].Output.Device = list[3, i];
+                    DAQTest[k].Output.Device = list[3, i].ToUpper();
                     DAQTest[k].Output.Channel = Convert.ToInt32(list[4, i]);
                     DAQTest[k].Comment = list[5, i];
                     DAQTest[k].Value = list[6, i];
@@ -439,7 +439,7 @@ namespace ExcelLib
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static EData3[] ParseEx3(string path)
+        public static IndTest[] ParseInd(string path)
         {
             try
             {
@@ -499,10 +499,10 @@ namespace ExcelLib
 
                 }
 
-                EData3 = new EData3[lenght];
-                for (int i = 0; i < EData3.Length; i++)
+                IndTest = new IndTest[lenght];
+                for (int i = 0; i < IndTest.Length; i++)
                 {
-                    EData3[i] = new EData3(intSize[i] + 1, intSize2[i] + 1);
+                    IndTest[i] = new IndTest(intSize[i] + 1, intSize2[i] + 1);
                 }
                 int k = 0;
                 for (int i = 0; i < table.Rows.Count; i++)
@@ -511,31 +511,31 @@ namespace ExcelLib
                     bool isNum = int.TryParse(list[0, i], out num);
                     if (list[0, i] != String.Empty && isNum)
                     {
-                        EData3[k].Index = Convert.ToInt32(list[0, i]);
+                        IndTest[k].Index = Convert.ToInt32(list[0, i]);
                         switch (list[1, i])
                         {
                             case "3":
-                                EData3[k].MultMode = MultMode.DCVoltage;
+                                IndTest[k].MultMode = MultMode.DCVoltage;
                                 break;
                             case "2":
-                                EData3[k].MultMode = MultMode.Resistance;
+                                IndTest[k].MultMode = MultMode.Resistance;
                                 break;
                             case "1":
-                                EData3[k].MultMode = MultMode.DiodeTest;
+                                IndTest[k].MultMode = MultMode.DiodeTest;
                                 break;
                             case "0":
-                                EData3[k].MultMode = 0;
+                                IndTest[k].MultMode = 0;
                                 break;
                         }
-                        if (EData3[k].CurrSource.Length != 1)
+                        if (IndTest[k].CurrSource.Length != 1)
                         {
                             string[] curr = list[2, i].Split('/');
-                            EData3[k].CurrSource[0].CurrSource = Convert.ToInt32(curr[0]);
-                            EData3[k].CurrSource[1].CurrSource = Convert.ToInt32(curr[1]);
+                            IndTest[k].CurrSource[0].CurrSource = Convert.ToInt32(curr[0]);
+                            IndTest[k].CurrSource[1].CurrSource = Convert.ToInt32(curr[1]);
                         }
                         else
                         {
-                            EData3[k].CurrSource[0].CurrSource = Convert.ToInt32(list[2, i]);
+                            IndTest[k].CurrSource[0].CurrSource = Convert.ToInt32(list[2, i]);
                         }
 
 
@@ -543,67 +543,68 @@ namespace ExcelLib
 
                         if (voltage[0] == "-")
                         {
-                            EData3[k].VoltSupply.V1 = 0;
+                            IndTest[k].VoltSupply.V1 = 0;
                         }
                         else
                         {
-                            EData3[k].VoltSupply.V1 = Convert.ToInt32(voltage[0]);
+                            IndTest[k].VoltSupply.V1 = Convert.ToInt32(voltage[0]);
                         }
 
                         if (voltage[1] == "-")
                         {
-                            EData3[k].VoltSupply.V2 = 0;
+                            IndTest[k].VoltSupply.V2 = 0;
                         }
                         else
                         {
-                            EData3[k].VoltSupply.V2 = Convert.ToInt32(voltage[1]);
+                            IndTest[k].VoltSupply.V2 = Convert.ToInt32(voltage[1]);
                         }
 
                         list[4, i] = list[4, i].ToLower();
                         var device = list[4, i].Split('/');
-                        for (int j = 0; j < EData3[k].Input.Length; j++)
+                        for (int j = 0; j < IndTest[k].Input.Length; j++)
                         {
                             var device2 = device[j].Split('r');
                             var device3 = device2[0].Split('k');
-                            EData3[k].Input[j].Device = @"r" + device2[1];
+                            IndTest[k].Input[j].Device = @"r" + device2[1];
                             if (device3[0] != String.Empty)
                             {
-                                EData3[k].Input[j].Channel = Convert.ToInt32(device3[0]);
+                                IndTest[k].Input[j].Channel = Convert.ToInt32(device3[0]);
                             }
                             else
                             {
-                                EData3[k].Input[j].Channel = Convert.ToInt32(device3[1]);
+                                IndTest[k].Input[j].Channel = Convert.ToInt32(device3[1]);
                             }
                         }
                         //Комментарий
-                        EData3[k].Comment = list[5, i];
+                        IndTest[k].Comment = list[5, i];
 
                         //Контроль
                         switch (list[6, i])
                         {
                             case "напряжение":
-                                EData3[k].Control = Control.Напряжение;
+                            default:
+                                IndTest[k].Control = Control.Напряжение;
                                 break;
                             case "сопротивление":
-                                EData3[k].Control = Control.Сопротивление;
+                                IndTest[k].Control = Control.Сопротивление;
                                 break;
                             case "индикация":
-                                EData3[k].Control = Control.Индикация;
+                                IndTest[k].Control = Control.Индикация;
                                 break;
-                            case "падение напряжение БК":
-                                EData3[k].Control = Control.ПадениеНапряженияБк;
+                            case "падение напряжения БК":
+                                IndTest[k].Control = Control.ПадениеНапряженияБк;
                                 break;
-                            case "падение напряжение БЭ":
-                                EData3[k].Control = Control.ПадениеНапряженияБэ;
+                            case "падение напряжения БЭ":
+                                IndTest[k].Control = Control.ПадениеНапряженияБэ;
                                 break;
-                            case "падение напряжение КБ":
-                                EData3[k].Control = Control.ПадениеНапряженияКб;
+                            case "падение напряжения КБ":
+                                IndTest[k].Control = Control.ПадениеНапряженияКб;
                                 break;
-                            case "падение напряжение ЭБ":
-                                EData3[k].Control = Control.ПадениеНапряженияЭб;
+                            case "падение напряжения ЭБ":
+                                IndTest[k].Control = Control.ПадениеНапряженияЭб;
                                 break;
-                            case "падение напряжение ЭК":
-                                EData3[k].Control = Control.ПадениеНапряженияЭк;
+                            case "падение напряжения ЭК":
+                                IndTest[k].Control = Control.ПадениеНапряженияЭк;
                                 break;
                         }
 
@@ -613,17 +614,17 @@ namespace ExcelLib
                             if (!Double.TryParse(list[7, i], out data))
                             {
                                 var min = list[7, i].Split(' ');
-                                EData3[k].ValMin = Convert.ToDouble(min[0]);
-                                EData3[k].ValUnit = min[1];
+                                IndTest[k].ValMin = Convert.ToDouble(min[0]);
+                                IndTest[k].ValUnit = min[1];
                             }
                             else
                             {
-                                EData3[k].ValMin = data;
+                                IndTest[k].ValMin = data;
                             }
                         }
                         else
                         {
-                            EData3[k].ValMin = 0;
+                            IndTest[k].ValMin = 0;
                         }
 
                         if (list[8, i] != String.Empty)
@@ -634,26 +635,26 @@ namespace ExcelLib
                                 if (!Double.TryParse(list[8, i], out data2) && list[8, i] != String.Empty)
                                 {
                                     var max = list[8, i].Split(' ');
-                                    EData3[k].ValMax = Convert.ToDouble(max[0]);
+                                    IndTest[k].ValMax = Convert.ToDouble(max[0]);
                                 }
                                 else
                                 {
-                                    EData3[k].ValMax = data2;
+                                    IndTest[k].ValMax = data2;
                                 }
                             }
                             else
                             {
-                                EData3[k].ValMax = Double.MaxValue;
+                                IndTest[k].ValMax = Double.MaxValue;
                             }
                         }
                         else
                         {
-                            EData3[k].ValMax = 0;
+                            IndTest[k].ValMax = 0;
                         }
                         k++;
                     }
                 }
-                return EData3;
+                return IndTest;
             }
             catch (Exception ex)
             {
@@ -815,19 +816,23 @@ namespace ExcelLib
                         BPPPTest[k].Index = value;
 
                         if (list[3, i] != String.Empty)
-                            BPPPTest[k].Min = Convert.ToDouble(list[3, i]); //list[3, i]
-                        else BPPPTest[k].Min = Double.NegativeInfinity;
+                            BPPPTest[k].Delay = Convert.ToUInt16(list[3, i]); //list[3, i]
+                        else BPPPTest[k].Delay = 0;
 
                         if (list[4, i] != String.Empty)
-                            BPPPTest[k].Max = Convert.ToDouble(list[4, i]); //list[4, i]
-                        else BPPPTest[k].Max = Double.NegativeInfinity;
+                            BPPPTest[k].Min = Convert.ToDouble(list[4, i]); //list[4, i]
+                        else BPPPTest[k].Min = Double.NegativeInfinity;
 
                         if (list[5, i] != String.Empty)
-                            BPPPTest[k].Value = Convert.ToDouble(list[5, i]); //list[5, i]
+                            BPPPTest[k].Max = Convert.ToDouble(list[5, i]); //list[5, i]
+                        else BPPPTest[k].Max = Double.NegativeInfinity;
+
+                        if (list[6, i] != String.Empty)
+                            BPPPTest[k].Value = Convert.ToDouble(list[6, i]); //list[6, i]
                         else BPPPTest[k].Value = Double.NegativeInfinity;
 
-                        BPPPTest[k].Comment = list[6, i] + " " + list[7, i];
-                        BPPPTest[k].Range = Convert.ToInt32(list[8, i]);
+                        BPPPTest[k].Comment = list[7, i] + " " + list[8, i];
+                        BPPPTest[k].Range = Convert.ToInt32(list[9, i]);
 
                         list[1,i] = list[1, i].ToLower();
                         var indata = list[1, i].Split('/');
@@ -848,7 +853,7 @@ namespace ExcelLib
                             BPPPTest[k].Output[j].Device = "r" + outdata2[1];
                             BPPPTest[k].Output[j].Channel = Convert.ToInt32(outdata3[1]);
                         }
-                        BPPPTest[k].Result = list[9, i];
+                        BPPPTest[k].Result = list[10, i];
                         k++;
                     }
                 }
@@ -955,22 +960,23 @@ namespace ExcelLib
             xlWorkSheet = (MSExcel.Worksheet)xlWorkBook.Worksheets.Item[1];
 
             //При добавлении столбцов, изменить размер массива(ниже при  MSExcel.Range r  тоже!)
-            string[,] arr = new string[data.Length + 3, 10];
+            string[,] arr = new string[data.Length + 3, 11];
             arr[0, 0] = "Номер проверки";
             arr[0, 1] = "A";
             arr[0, 2] = "B";
-            arr[0, 3] = "Максимальные допустимые значения";
-            arr[0, 4] = " ";
-            arr[1, 3] = "MIN";
-            arr[1, 4] = "MAX";
-            arr[0, 5] = "Измеренные значения";
-            arr[0, 6] = "Комментарии";
-            arr[1, 6] = "A";
-            arr[0, 7] = " ";
-            arr[1, 7] = "B";
-            arr[0, 8] = "Диапазон";
-            arr[1, 8] = "Ом";
-            arr[0, 9] = "Результат";
+            arr[0, 3] = "Задержка, мс";
+            arr[0, 4] = "Максимальные допустимые значения";
+            arr[0, 5] = " ";
+            arr[1, 4] = "MIN";
+            arr[1, 5] = "MAX";
+            arr[0, 6] = "Измеренные значения";
+            arr[0, 7] = "Комментарии";
+            arr[1, 7] = "A";
+            arr[0, 8] = " ";
+            arr[1, 8] = "B";
+            arr[0, 9] = "Диапазон";
+            arr[1, 9] = "Ом";
+            arr[0, 10] = "Результат";
 
 
             bool[] successColor = new bool[data.Length + 3];
@@ -995,24 +1001,25 @@ namespace ExcelLib
                     arr[i, 2] += "k" + data[k].Output[j].Channel + data[k].Output[j].Device;
                 }
 
+                arr[i, 3] = data[k].Delay.ToString();
                 // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                arr[i, 3] = data[k].Min.ToString();
+                arr[i, 4] = data[k].Min.ToString();
                 // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                arr[i, 4] = data[k].Max.ToString();
+                arr[i, 5] = data[k].Max.ToString();
                 // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                arr[i, 5] = data[k].Value.ToString();
+                arr[i, 6] = data[k].Value.ToString();
                 var tcom = data[k].Comment.Split(' ');
-                arr[i, 6] = tcom[0];
-                arr[i, 7] = tcom[1];
-                arr[i, 8] = data[k].Range.ToString();
-                arr[i, 9] = data[k].Result;
+                arr[i, 7] = tcom[0];
+                arr[i, 8] = tcom[1];
+                arr[i, 9] = data[k].Range.ToString();
+                arr[i, 10] = data[k].Result;
                 if (data[k].Result == "PASSED")
                     successColor[k] = true;
                 k++;
             }
             try
             {
-                MSExcel.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[data.Length + 2, 10]];
+                MSExcel.Range r = xlWorkSheet.Range[xlWorkSheet.Cells[1, 1], xlWorkSheet.Cells[data.Length + 2, 11]];
                 r.Value = arr;
                 xlWorkSheet.Columns.EntireColumn.AutoFit();
 
@@ -1022,8 +1029,8 @@ namespace ExcelLib
                 for (int i = 0; i < successColor.Length - 3; i++)
                 {
                     if (successColor[i])
-                        xlWorkSheet.Cells[i + 3, 10].Font.Color = MSExcel.XlRgbColor.rgbGreen;
-                    else xlWorkSheet.Cells[i + 3, 10].Font.Color = MSExcel.XlRgbColor.rgbRed;
+                        xlWorkSheet.Cells[i + 3, 11].Font.Color = MSExcel.XlRgbColor.rgbGreen;
+                    else xlWorkSheet.Cells[i + 3, 11].Font.Color = MSExcel.XlRgbColor.rgbRed;
                 }
                 //var columnHeadingsRange = xlWorkSheet.Range[
                 //    xlWorkSheet.Cells[COLUMN_HEADING_ROW, FIRST_COL],

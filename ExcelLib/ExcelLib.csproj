@@ -66,10 +66,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DAQTest.cs" />
-    <Compile Include="EData3.cs" />
     <Compile Include="EData4.cs" />
     <Compile Include="BPPPTest.cs" />
     <Compile Include="Excel.cs" />
+    <Compile Include="IndTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

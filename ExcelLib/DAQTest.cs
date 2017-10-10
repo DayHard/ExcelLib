@@ -63,5 +63,10 @@ namespace ExcelLib
             get { return _device; }
             set { _device = value; }
         }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
     }
 }

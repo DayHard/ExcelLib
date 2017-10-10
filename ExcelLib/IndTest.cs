@@ -21,9 +21,9 @@ namespace ExcelLib
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         DCVoltage
     }
-    public class EData3
+    public class IndTest
     {
-        public EData3()
+        public IndTest()
         {
             _index = 0;
             _comment = String.Empty;
@@ -33,7 +33,7 @@ namespace ExcelLib
             Input = new Contact[7];
             VoltSupply = new VoltSupply();
         }
-        public EData3(int inputCount, int inputCount2)
+        public IndTest(int inputCount, int inputCount2)
         {
             _index = 0;
             _comment = String.Empty;

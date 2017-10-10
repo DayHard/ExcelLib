@@ -33,14 +33,16 @@ namespace TestExcel
             //    var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
             //}
 
-            DAQTest[] DAQTest= null;
+            //DAQTest[] DAQTest= null;
+            //IndTest[] Indtest = null;
+            BPPPTest[] BPPPTest = null;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                DAQTest = Excel.ParseDAQ(openFileDialog.FileName);
+                BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);
             }
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var status = Excel.SaveDAQ(DAQTest, saveFileDialog.FileName);
+                var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
             }
         }
 
