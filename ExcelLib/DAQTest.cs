@@ -10,11 +10,13 @@ namespace ExcelLib
         public Contact Output;
         private string _result;
         private string _value;
+        private string _errordescription;
 
         public DAQTest()
         {
             _index = 0;
-            _comment = String.Empty;
+            _comment = string.Empty;
+            _errordescription = string.Empty;
             Input = new Contact();
             Output = new Contact();
         }
@@ -40,6 +42,12 @@ namespace ExcelLib
             get { return _value; }
             set { _value = value; }
         }
+
+        public string ErrorDescription
+        {
+            get { return _errordescription; }
+            set { _errordescription = value; }
+        }
     }
 
     public class Contact
@@ -62,11 +70,6 @@ namespace ExcelLib
         {
             get { return _device; }
             set { _device = value; }
-        }
-
-        public override string ToString()
-        {
-            return base.ToString();
         }
     }
 }

@@ -26,20 +26,22 @@ namespace ExcelLib
         public IndTest()
         {
             _index = 0;
-            _comment = String.Empty;
+            _comment = string.Empty;
             _valMin = 0;
             _valMax = 0;
-            _valUnit = String.Empty;
+            _valUnit = string.Empty;
+            _errordescription = string.Empty;
             Input = new Contact[7];
             VoltSupply = new VoltSupply();
         }
         public IndTest(int inputCount, int inputCount2)
         {
             _index = 0;
-            _comment = String.Empty;
+            _comment = string.Empty;
             _valMin = 0;
             _valMax = 0;
-            _valUnit = String.Empty;
+            _valUnit = string.Empty;
+            _errordescription = string.Empty;
             VoltSupply = new VoltSupply();
             Input = new Contact[inputCount];
             for (int i = 0; i < Input.Length; i++)
@@ -58,6 +60,7 @@ namespace ExcelLib
         private double _valMin;
         private double _valMax;
         private string _valUnit;
+        private string _errordescription;
         public Contact[] Input;
         public MultMode MultMode;
         public Control Control;
@@ -93,6 +96,12 @@ namespace ExcelLib
         {
             get { return _valUnit; }
             set { _valUnit = value; }
+        }
+
+        public string ErrorDescription
+        {
+            get { return _errordescription; }
+            set { _errordescription = value; }
         }
     }
 

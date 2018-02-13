@@ -23,27 +23,35 @@ namespace TestExcel
 
         private void btnClickMe_Click(object sender, EventArgs e)
         {
+            IndTest[] IndTest = null;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                IndTest = Excel.ParseInd(openFileDialog.FileName);
+            }
+            //if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //    var status = Excel.SaveBPPP(IndTest, saveFileDialog.FileName);
+            //}
+
             //BPPPTest[] BPPPTest = null;
             //if (openFileDialog.ShowDialog() == DialogResult.OK)
             //{
-            //     BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);     
+            //    BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);
             //}
             //if (saveFileDialog.ShowDialog() == DialogResult.OK)
             //{
             //    var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
             //}
 
-            //DAQTest[] DAQTest= null;
-            //IndTest[] Indtest = null;
-            BPPPTest[] BPPPTest = null;
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);
-            }
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
-            }
+            //DAQTest[] DAQTest = null;
+            //if (openFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //    DAQTest = Excel.ParseDAQ(openFileDialog.FileName);
+            //}
+            //if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //    var status = Excel.SaveDAQ(DAQTest, saveFileDialog.FileName);
+            //}
         }
 
         private void btnAutoClick_Click(object sender, EventArgs e)
