@@ -29,6 +29,7 @@ namespace ExcelLib
         private double _min;
         private double _max;
         private double _value;
+        private double _accuracy;
         private string _comment;
         private string _result;
         private string _errordescription;
@@ -60,7 +61,11 @@ namespace ExcelLib
             get { return _value; }
             set { _value = value; }
         }
-
+        public double Accuracy
+        {
+            get { return _accuracy; }
+            set { _accuracy = value; }
+        }
         public string Comment
         {
             get { return _comment; }
@@ -90,5 +95,6 @@ namespace ExcelLib
             get { return _errordescription; }
             set { _errordescription = value; }
         }
+
     }
 }

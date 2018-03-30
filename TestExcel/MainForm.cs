@@ -23,25 +23,25 @@ namespace TestExcel
 
         private void btnClickMe_Click(object sender, EventArgs e)
         {
-            IndTest[] IndTest = null;
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                IndTest = Excel.ParseInd(openFileDialog.FileName);
-            }
-            //if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            //IndTest[] IndTest = null;
+            //if (openFileDialog.ShowDialog() == DialogResult.OK)
+            //{
+            //    IndTest = Excel.ParseInd(openFileDialog.FileName);
+            //}
+            ////if (saveFileDialog.ShowDialog() == DialogResult.OK)
             //{
             //    var status = Excel.SaveBPPP(IndTest, saveFileDialog.FileName);
             //}
 
-            //BPPPTest[] BPPPTest = null;
-            //if (openFileDialog.ShowDialog() == DialogResult.OK)
-            //{
-            //    BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);
-            //}
-            //if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            //{
-            //    var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
-            //}
+            BPPPTest[] BPPPTest = null;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);
+            }
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var status = Excel.SaveBPPP(BPPPTest, saveFileDialog.FileName);
+            }
 
             //DAQTest[] DAQTest = null;
             //if (openFileDialog.ShowDialog() == DialogResult.OK)
