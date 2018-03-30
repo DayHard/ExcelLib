@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using static System.String;
 using MSExcel = Microsoft.Office.Interop.Excel;
@@ -857,7 +856,14 @@ namespace ExcelLib
                         if (collums >= 12)
                             BPPPTest[k].ErrorDescription = list[11, i];
                         if (collums >= 13)
-                            BPPPTest[k].Accuracy = Convert.ToDouble(list[12, i]);
+                        {
+                            double acr;
+                            Double.TryParse(list[12, i], out acr);
+                            if (acr != 3.5  && acr != 4.5 && acr != 5.5 && acr != 6.5 && acr != 7.5)
+                                acr = 0;
+                            BPPPTest[k].Accuracy = acr;
+                        }
+
                         k++;
                     }
                 }
