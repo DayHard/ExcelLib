@@ -36,7 +36,9 @@ namespace TestExcel
             BPPPTest[] BPPPTest = null;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                BPPPTest = Excel.ParseBPPP(openFileDialog.FileName);
+                string error;
+                BPPPTest = Excel.ParseBPPP(openFileDialog.FileName, out error);
+                MessageBox.Show(error);
             }
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {

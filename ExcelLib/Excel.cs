@@ -734,14 +734,15 @@ namespace ExcelLib
         /// <summary>
         /// Используется для блока проверки печатных плат, возвращает тесты ввиде массива (BPPP) [Без описания ошибки]
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Путь к файлу</param>
+        /// <param name="error">Описание ошибки ошибку</param>
         /// <returns>Возвращает BPPPTest[]</returns>
-        public static BPPPTest[] ParseBPPP(string path)
+        public static BPPPTest[] ParseBPPP(string path, out string error)
         {
+            error = Empty;
             try
             {
                 var table = ParseTable(path);
-
                 string[,] list = new string[table.Columns.Count, table.Rows.Count];
 
                 if (table.Columns.Count == 0 && table.Rows.Count == 0)
@@ -766,7 +767,6 @@ namespace ExcelLib
                         lenght = parsedValue;
                     }
                 }
-
                 int counter = 0;
                 int[] intSize = new int[lenght];
                 for (int i = 0; i < intSize.Length; i++)
@@ -798,7 +798,6 @@ namespace ExcelLib
                     }
 
                 }
-
                 BPPPTest = new BPPPTest[lenght];
                 for (int i = 0; i < BPPPTest.Length; i++)
                 {
@@ -816,17 +815,20 @@ namespace ExcelLib
                             BPPPTest[k].Delay = Convert.ToUInt16(list[3, i]); //list[3, i]
                         else BPPPTest[k].Delay = 0;
 
-                        if (list[4, i] != Empty)
-                            BPPPTest[k].Min = Convert.ToDouble(list[4, i]); //list[4, i]
-                        else BPPPTest[k].Min = Double.NegativeInfinity;
+                            double min;
+                        if (double.TryParse(list[4, i], out min))
+                            BPPPTest[k].Min = min;
+                        else BPPPTest[k].Min = double.PositiveInfinity;
 
-                        if (list[5, i] != Empty)
-                            BPPPTest[k].Max = Convert.ToDouble(list[5, i]); //list[5, i]
-                        else BPPPTest[k].Max = Double.NegativeInfinity;
+                            double max;
+                        if (double.TryParse(list[5, i], out max))
+                            BPPPTest[k].Max = max;
+                        else BPPPTest[k].Max = double.PositiveInfinity;
 
-                        if (list[6, i] != Empty)
-                            BPPPTest[k].Value = Convert.ToDouble(list[6, i]); //list[6, i]
-                        else BPPPTest[k].Value = Double.NegativeInfinity;
+                            double value1;
+                        if (double.TryParse(list[6, i], out value1))
+                            BPPPTest[k].Value = value1;
+                        else BPPPTest[k].Value = double.PositiveInfinity;
 
                         BPPPTest[k].Comment = list[7, i] + " " + list[8, i];
                         BPPPTest[k].Range = Convert.ToInt32(list[9, i]);
@@ -840,7 +842,6 @@ namespace ExcelLib
                             BPPPTest[k].Input[j].Device = "r" + indata2[1];
                             BPPPTest[k].Input[j].Channel = Convert.ToInt32(indata3[1]);
                         }
-
                         list[2, i] = list[2, i].ToLower();
                         var outdata = list[2, i].Split('/');
                         for (int j = 0; j < BPPPTest[k].Output.Length; j++)
@@ -871,6 +872,11 @@ namespace ExcelLib
             }
             catch (Exception ex)
             {
+                error =  Environment.NewLine + "Error: " 
+                         + ex.Message + 
+                         Environment.NewLine + "StackTrace: " +
+                         ex.StackTrace;
+
                 return null;
             }
         }
