@@ -1023,11 +1023,26 @@ namespace ExcelLib
 
                 arr[i, 3] = data[k].Delay.ToString();
                 // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                arr[i, 4] = data[k].Min.ToString();
+                if (double.IsNegativeInfinity(data[k].Min))
+                    arr[i, 4] = "-∞";
+                else if (double.IsPositiveInfinity(data[k].Min))
+                    arr[i, 4] = "∞";
+                else arr[i, 4] = data[k].Min.ToString();
+
                 // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                arr[i, 5] = data[k].Max.ToString();
+                if (double.IsNegativeInfinity(data[k].Max))
+                    arr[i, 5] = "-∞";
+                else if (double.IsPositiveInfinity(data[k].Max))
+                    arr[i, 5] = "∞";
+                else arr[i, 5] = data[k].Max.ToString();
+
                 // ReSharper disable once SpecifyACultureInStringConversionExplicitly
-                arr[i, 6] = data[k].Value.ToString();
+                if (double.IsNegativeInfinity(data[k].Value))
+                    arr[i, 6] = "-∞";
+                else if (double.IsPositiveInfinity(data[k].Value))
+                    arr[i, 6] = "∞";
+                else arr[i, 6] = data[k].Value.ToString();
+
                 var tcom = data[k].Comment.Split(' ');
                 arr[i, 7] = tcom[0];
                 arr[i, 8] = tcom[1];
